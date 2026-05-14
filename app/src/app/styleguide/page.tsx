@@ -9,6 +9,10 @@ import { ButtonsSection } from "@/components/styleguide/ButtonsSection";
 import { FormsSection } from "@/components/styleguide/FormsSection";
 import { CardsSection } from "@/components/styleguide/CardsSection";
 import { TagsSection } from "@/components/styleguide/TagsSection";
+import {
+  NavMobileSection,
+  NavDesktopSection,
+} from "@/components/styleguide/NavSection";
 
 export const metadata = {
   title: "Designsystem · DogWorld(tmp)",
@@ -66,6 +70,10 @@ export default function StyleguidePage() {
         <CardsSection />
         <TagsSection />
 
+        {/* Navigation */}
+        <NavMobileSection />
+        <NavDesktopSection />
+
         {/* Placeholder for sections still to come */}
         <section className="py-16 border-t border-n-100">
           <div className="bg-bg-card rounded-card border border-n-200 p-12 text-center">
@@ -73,12 +81,12 @@ export default function StyleguidePage() {
               Kommer i neste commits
             </p>
             <h2 className="text-2xl font-semibold mb-3 text-n-950">
-              Navigasjon, mønstre, hund-atomer
+              Mønstre + hund-atomer
             </h2>
             <p className="text-n-700 max-w-md mx-auto">
-              Resten av designsystemet (mobil + desktop navigasjon,
-              empty-states, toaster, bottom sheet, stamtavle-noder, helse-rader,
-              foto-grid, kull-tidslinje) bygges i påfølgende commits.
+              Resten av designsystemet (empty-states, toaster og dialoger,
+              bottom sheet, stamtavle-noder, helse-rader, foto-grid,
+              kull-tidslinje) bygges i påfølgende commits.
             </p>
           </div>
         </section>
