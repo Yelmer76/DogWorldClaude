@@ -13,6 +13,11 @@ import {
   NavMobileSection,
   NavDesktopSection,
 } from "@/components/styleguide/NavSection";
+import {
+  EmptyLoadingErrorSection,
+  ToastDialogSection,
+  SheetSection,
+} from "@/components/styleguide/PatternsSections";
 
 export const metadata = {
   title: "Designsystem · DogWorld(tmp)",
@@ -74,19 +79,23 @@ export default function StyleguidePage() {
         <NavMobileSection />
         <NavDesktopSection />
 
+        {/* Patterns */}
+        <EmptyLoadingErrorSection />
+        <ToastDialogSection />
+        <SheetSection />
+
         {/* Placeholder for sections still to come */}
         <section className="py-16 border-t border-n-100">
           <div className="bg-bg-card rounded-card border border-n-200 p-12 text-center">
             <p className="text-xs uppercase tracking-[0.08em] font-medium text-n-500 mb-2">
-              Kommer i neste commits
+              Kommer i siste commit
             </p>
             <h2 className="text-2xl font-semibold mb-3 text-n-950">
-              Mønstre + hund-atomer
+              Hund-spesifikke atomer
             </h2>
             <p className="text-n-700 max-w-md mx-auto">
-              Resten av designsystemet (empty-states, toaster og dialoger,
-              bottom sheet, stamtavle-noder, helse-rader, foto-grid,
-              kull-tidslinje) bygges i påfølgende commits.
+              Stamtavle-noder, helse-rader, foto-grid og kull-tidslinje bygges
+              som siste sprint.
             </p>
           </div>
         </section>

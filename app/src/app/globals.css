@@ -106,3 +106,13 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--color-forest-100);
   color: var(--color-forest-900);
 }
+
+/* Skeleton shimmer animation (used by dogworld/Patterns SkeletonLine etc.) */
+@keyframes dw-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
