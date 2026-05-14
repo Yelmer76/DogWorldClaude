@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   DogWorld(tmp) — "The Expert Trio" design tokens
+   Source of truth: docs/memory/design_handoff_canonical.md
+   ───────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  /* ── Brand ─────────────────────────────────────────────────────────── */
+  --color-forest-900: #243430;
+  --color-forest-700: #3f5a55; /* sage primary — brand, nav, focus rings */
+  --color-forest-500: #6b8581;
+  --color-forest-100: #dde4e2;
+  --color-forest-50: #edf1f0;
+
+  --color-ochre-700: #11253a;
+  --color-ochre-600: #1c3245; /* deep navy — primary actions, count badges */
+  --color-ochre-200: #b8c4d0;
+  --color-ochre-50: #e6ebef;
+
+  --color-warm-600: #c98a27; /* warm ochre — FAB only, celebration touches */
+
+  /* ── Surfaces ──────────────────────────────────────────────────────── */
+  --color-bg-page: #f5f2ed; /* warm oatmeal */
+  --color-bg-card: #ffffff;
+
+  /* ── Warm-tinted neutrals ──────────────────────────────────────────── */
+  --color-n-950: #1a1a1a;
+  --color-n-700: #5d5d5d;
+  --color-n-500: #9a9a9a;
+  --color-n-300: #c4c0b7;
+  --color-n-200: #dcd8cf;
+  --color-n-100: #ebe7de;
+  --color-n-50: #efebe2;
+
+  /* ── State colors — muted Nordic ───────────────────────────────────── */
+  --color-success-bg: #e3ede2;
+  --color-success-fg: #3d6b46;
+  --color-success-dot: #4a7c59;
+
+  --color-warning-bg: #f3e6cc;
+  --color-warning-fg: #8a5a1a;
+  --color-warning-dot: #c98a27;
+
+  --color-error-bg: #edd6d2;
+  --color-error-fg: #8a3f3a;
+  --color-error-dot: #a8504a;
+
+  --color-info-bg: #dde4ec;
+  --color-info-fg: #41617f;
+  --color-info-dot: #5a7a9a;
+
+  /* ── Sex coloring (pedigree, conversation) ─────────────────────────── */
+  --color-sire-bar: #5a7a9a;
+  --color-sire-chip-bg: #e8eef4;
+  --color-sire-chip-fg: #3e5a76;
+  --color-dam-bar: #c0789a;
+  --color-dam-chip-bg: #f4dde6;
+  --color-dam-chip-fg: #8a4870;
+
+  /* ── Radius ────────────────────────────────────────────────────────── */
+  --radius-tag: 4px;
+  --radius-btn: 6px;
+  --radius-card: 8px;
+
+  /* ── Shadows — extremely subtle ────────────────────────────────────── */
+  --shadow-1: 0 1px 2px rgba(26, 26, 26, 0.04), 0 1px 1px rgba(26, 26, 26, 0.03);
+  --shadow-2: 0 2px 4px rgba(26, 26, 26, 0.05), 0 4px 12px rgba(26, 26, 26, 0.05);
+  --shadow-3: 0 8px 24px rgba(26, 26, 26, 0.08), 0 2px 6px rgba(26, 26, 26, 0.05);
+}
+
+/* Font CSS variables come from next/font in layout.tsx → expose to Tailwind */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+/* ── Base styles ─────────────────────────────────────────────────────── */
+html {
+  background: var(--color-bg-page);
+}
+
+body {
+  background: var(--color-bg-page);
+  color: var(--color-n-950);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Mono font for credentials, dates, numerical data */
+.font-mono,
+[data-mono] {
+  font-family: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* Display headings */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* Subtle selection color matching brand */
+::selection {
+  background: var(--color-forest-100);
+  color: var(--color-forest-900);
+}
