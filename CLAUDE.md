@@ -4,6 +4,36 @@
 
 ---
 
+## ⚠️ FILESYSTEM SCOPE — absolute boundary
+
+**Only work inside `D:\Antigravity\DogWorldClaude\` and its subdirectories.** Never write, modify, move, or delete anything outside this folder. This includes:
+
+- ❌ The parent folder `D:\Antigravity\` (contains Ole's many other projects)
+- ❌ Sibling project folders (`D:\Antigravity\5050bryllup`, `DND adventurer`, `DNDtools`, `Donahouve`, `DungeonRigWebsite`, `SimTowerClaude`, etc.)
+- ❌ Anywhere else on `D:\`, `C:\Users\Ole\` (except Claude Code's own state under `.claude/`), or anywhere else on the machine
+- ❌ `/tmp/` for anything beyond brief extraction work — clean up after yourself
+
+**Reading** files outside the project for narrowly-scoped reasons is OK (e.g., checking `node_modules/` for type definitions) but **never write** outside the project. If a tool, framework, or workflow tries to put files outside the project, intercept it and re-route inside.
+
+If you genuinely need to touch something outside this folder (extremely rare), STOP and ask Ole.
+
+## Self-test responsibility
+
+**You build, you test.** Don't ask Ole to manually test things you can verify yourself. Before reporting work as done:
+
+1. **Build:** `npm run build` (catches type errors, lint, Tailwind, bundling)
+2. **Lint:** `npm run lint` (where configured)
+3. **Smoke-test:** start dev server in background, curl key routes, verify status 200 + expected content in HTML
+4. **Stop the server** when done
+
+Only escalate to Ole when:
+- Something legitimately requires visual / UX judgment (e.g., "does this color feel right?")
+- A strategic decision is needed (architecture, scope, priority)
+- An external resource needs his approval (per security policy)
+- Build / test fails and you've genuinely exhausted the diagnosis
+
+Never escalate "is it working?" — find out yourself first.
+
 ## Brand placeholder
 
 The product name "DogWorld" is a working title only. **Use `DogWorld(tmp)` in all code, UI strings, copy, and documentation** until the founder locks the final brand and trademark. When the brand changes, it changes once across the codebase via i18n keys / constants.
