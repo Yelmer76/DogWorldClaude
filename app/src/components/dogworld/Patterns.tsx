@@ -88,10 +88,21 @@ const dotClasses: Record<ToastTone, string> = {
 export type ToastProps = {
   tone?: ToastTone;
   children: ReactNode;
+  /**
+   * When true, renders the dismiss X. Separate from `onDismiss` so server
+   * components can request the dismiss UI without passing a handler.
+   */
+  dismissible?: boolean;
   onDismiss?: () => void;
 };
 
-export function Toast({ tone = "success", children, onDismiss }: ToastProps) {
+export function Toast({
+  tone = "success",
+  children,
+  dismissible,
+  onDismiss,
+}: ToastProps) {
+  const showDismiss = dismissible || Boolean(onDismiss);
   return (
     <div
       className="bg-n-950 text-white py-2.5 px-3.5 rounded-btn inline-flex items-center gap-3 text-sm shadow-[0_8px_24px_rgba(26,26,26,0.08),0_2px_6px_rgba(26,26,26,0.05)]"
@@ -100,7 +111,7 @@ export function Toast({ tone = "success", children, onDismiss }: ToastProps) {
     >
       <span className={`w-2 h-2 rounded-full ${dotClasses[tone]}`} aria-hidden />
       <span className="flex-1">{children}</span>
-      {onDismiss && (
+      {showDismiss && (
         <button
           type="button"
           onClick={onDismiss}

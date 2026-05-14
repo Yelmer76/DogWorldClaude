@@ -114,13 +114,13 @@ export function ToastDialogSection() {
         <div>
           <FrameLabel>Toaster</FrameLabel>
           <div className="bg-bg-page border border-n-200 rounded-card p-4 flex flex-col gap-3 items-start">
-            <Toast tone="success" onDismiss={() => {}}>
+            <Toast tone="success" dismissible>
               Kull C lagret · DHPPi-1 påminnelse lagt til
             </Toast>
-            <Toast tone="warning" onDismiss={() => {}}>
+            <Toast tone="warning" dismissible>
               Astors HD-sertifikat utløper om 28 dager
             </Toast>
-            <Toast tone="error" onDismiss={() => {}}>
+            <Toast tone="error" dismissible>
               Kunne ikke synkronisere med NKK · vi prøver videre
             </Toast>
           </div>

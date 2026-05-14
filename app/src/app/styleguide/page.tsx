@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { Toc } from "@/components/styleguide/Toc";
 import { ColorSection } from "@/components/styleguide/ColorSection";
@@ -18,10 +20,14 @@ import {
   ToastDialogSection,
   SheetSection,
 } from "@/components/styleguide/PatternsSections";
+import {
+  PedigreeSection,
+  HealthSection,
+  PhotoGridSection,
+  TimelineSection,
+} from "@/components/styleguide/DogAtomsSection";
 
-export const metadata = {
-  title: "Designsystem · DogWorld(tmp)",
-};
+// metadata can't be exported from a Client Component; the layout title still applies.
 
 export default function StyleguidePage() {
   return (
@@ -84,21 +90,19 @@ export default function StyleguidePage() {
         <ToastDialogSection />
         <SheetSection />
 
-        {/* Placeholder for sections still to come */}
-        <section className="py-16 border-t border-n-100">
-          <div className="bg-bg-card rounded-card border border-n-200 p-12 text-center">
-            <p className="text-xs uppercase tracking-[0.08em] font-medium text-n-500 mb-2">
-              Kommer i siste commit
-            </p>
-            <h2 className="text-2xl font-semibold mb-3 text-n-950">
-              Hund-spesifikke atomer
-            </h2>
-            <p className="text-n-700 max-w-md mx-auto">
-              Stamtavle-noder, helse-rader, foto-grid og kull-tidslinje bygges
-              som siste sprint.
-            </p>
+        {/* Dog-specific atoms */}
+        <PedigreeSection />
+        <HealthSection />
+        <PhotoGridSection />
+        <TimelineSection />
+
+        {/* Footer */}
+        <footer className="mt-16 py-8 border-t border-n-100 flex flex-wrap justify-between gap-4 text-xs text-n-500">
+          <div>
+            DogWorld(tmp) · Designsystem v0.1 · {new Date().getFullYear()}
           </div>
-        </section>
+          <div>Foundations + components + patterns + dog atoms — komplett</div>
+        </footer>
       </main>
     </div>
   );
