@@ -187,6 +187,7 @@ function DogDetailBody({ initialDog }: { initialDog: Dog }) {
       {/* Camera FAB — hidden in memorial mode (read-only) */}
       {!isMemorial && (
         <CameraFab
+          subject={dog.callName ?? dog.name}
           actions={[
             {
               id: "photo",

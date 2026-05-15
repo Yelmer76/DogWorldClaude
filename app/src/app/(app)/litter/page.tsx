@@ -180,6 +180,7 @@ function LitterInner() {
       </main>
 
       <CameraFab
+        subject={litterC.callName}
         actions={[
           { id: "photo", label: "Ta bilde av valpene", icon: "camera" },
           { id: "weight", label: "Logg veiing", icon: "scale" },

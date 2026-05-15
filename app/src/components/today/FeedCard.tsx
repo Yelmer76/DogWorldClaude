@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sparkline } from "@/components/dogworld/Sparkline";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/dogworld/ToastProvider";
+import { VetBookingModal } from "@/components/modals/VetBookingModal";
 import type { FeedCard as FeedCardData, FeedCardKind } from "./todayData";
 
 const kindAccent: Record<FeedCardKind, string> = {
@@ -36,8 +37,17 @@ const kindLabel: Record<FeedCardKind, string> = {
 export function FeedCard({ card }: { card: FeedCardData }) {
   const showToast = useToast();
   const [open, setOpen] = useState(card.kind === "hero-litter");
+  const [vetOpen, setVetOpen] = useState(false);
 
   const actions = card.actions ?? (card.action ? [card.action] : []);
+
+  function handleAction(label: string) {
+    if (label.startsWith("Bestill veterinærtime")) {
+      setVetOpen(true);
+      return;
+    }
+    showToast(`→ ${label}`, "info");
+  }
 
   return (
     <article
@@ -172,7 +182,7 @@ export function FeedCard({ card }: { card: FeedCardData }) {
                   key={a.label}
                   variant={a.primary ? "primary" : "secondary"}
                   size="sm"
-                  onClick={() => showToast(`→ ${a.label}`, "info")}
+                  onClick={() => handleAction(a.label)}
                 >
                   {a.label}
                 </Button>
@@ -197,6 +207,13 @@ export function FeedCard({ card }: { card: FeedCardData }) {
           </div>
         </div>
       </div>
+
+      <VetBookingModal
+        open={vetOpen}
+        onClose={() => setVetOpen(false)}
+        subject={card.dog}
+        defaultReason={card.headline}
+      />
     </article>
   );
 }

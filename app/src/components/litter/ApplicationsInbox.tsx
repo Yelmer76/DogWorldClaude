@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Tag } from "@/components/dogworld/Tag";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/dogworld/ToastProvider";
+import { OfferPuppyModal } from "@/components/modals/OfferPuppyModal";
 import {
   applications,
   puppies,
@@ -46,6 +47,7 @@ export function ApplicationsInbox() {
   const showToast = useToast();
   const [filter, setFilter] = useState<"all" | ApplicationStatus>("all");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [offerTo, setOfferTo] = useState<Application | null>(null);
 
   const visible =
     filter === "all"
@@ -99,7 +101,13 @@ export function ApplicationsInbox() {
               application={a}
               expanded={openId === a.id}
               onToggle={() => setOpenId(openId === a.id ? null : a.id)}
-              onAction={(label) => showToast(`→ ${label}`, "info")}
+              onAction={(label) => {
+                if (label === "Tilby valp") {
+                  setOfferTo(a);
+                } else {
+                  showToast(`→ ${label}`, "info");
+                }
+              }}
             />
           </li>
         ))}
@@ -109,6 +117,12 @@ export function ApplicationsInbox() {
           </li>
         )}
       </ul>
+
+      <OfferPuppyModal
+        open={offerTo !== null}
+        onClose={() => setOfferTo(null)}
+        applicantName={offerTo?.applicant ?? ""}
+      />
     </section>
   );
 }

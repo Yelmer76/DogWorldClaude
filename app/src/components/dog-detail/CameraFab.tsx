@@ -3,15 +3,18 @@
 import { useState } from "react";
 import { Sheet } from "@/components/dogworld/Sheet";
 import { useToast } from "@/components/dogworld/ToastProvider";
+import { PhotoUploadModal } from "@/components/modals/PhotoUploadModal";
+import { WeightLogModal } from "@/components/modals/WeightLogModal";
+import { NoteComposerModal } from "@/components/modals/NoteComposerModal";
 
 export type CameraFabAction = {
-  id: string;
+  id: "photo" | "cert" | "crit" | "weight" | "note" | "pedigree" | string;
   label: string;
   icon: "camera" | "doc" | "scan" | "scale" | "edit";
 };
 
 const defaultActions: CameraFabAction[] = [
-  { id: "photo", label: "Ta bilde av Astor", icon: "camera" },
+  { id: "photo", label: "Ta bilde", icon: "camera" },
   { id: "cert", label: "Skann helse-sertifikat", icon: "doc" },
   { id: "crit", label: "Skann utstillingskritikk", icon: "scan" },
   { id: "weight", label: "Logg vekt", icon: "scale" },
@@ -23,18 +26,50 @@ export type CameraFabProps = {
   actions?: CameraFabAction[];
   /** Override the bottom inset (default 24px from viewport bottom) */
   bottomOffset?: number;
+  /** Subject name passed into the modals (e.g. "Astor", "Kull C") */
+  subject?: string;
 };
+
+type OpenModal = null | "photo" | "weight" | "note" | "scan-cert" | "scan-crit";
 
 export function CameraFab({
   actions = defaultActions,
   bottomOffset = 24,
+  subject,
 }: CameraFabProps) {
   const showToast = useToast();
   const [open, setOpen] = useState(false);
+  const [modal, setModal] = useState<OpenModal>(null);
 
   function handleSelect(action: CameraFabAction) {
     setOpen(false);
-    showToast(`→ ${action.label}`, "info");
+    switch (action.id) {
+      case "photo":
+        setModal("photo");
+        break;
+      case "weight":
+        setModal("weight");
+        break;
+      case "note":
+        setModal("note");
+        break;
+      case "cert":
+        setModal("scan-cert");
+        showToast(
+          "Helse-sertifikat-skanner åpner kamera (kommer snart)",
+          "info",
+        );
+        break;
+      case "crit":
+        setModal("scan-crit");
+        showToast(
+          "Utstillingskritikk-skanner åpner kamera (kommer snart)",
+          "info",
+        );
+        break;
+      default:
+        showToast(`→ ${action.label}`, "info");
+    }
   }
 
   return (
@@ -75,6 +110,22 @@ export function CameraFab({
           ))}
         </ul>
       </Sheet>
+
+      <PhotoUploadModal
+        open={modal === "photo"}
+        onClose={() => setModal(null)}
+        subject={subject}
+      />
+      <WeightLogModal
+        open={modal === "weight"}
+        onClose={() => setModal(null)}
+        subject={subject}
+      />
+      <NoteComposerModal
+        open={modal === "note"}
+        onClose={() => setModal(null)}
+        subject={subject}
+      />
     </>
   );
 }

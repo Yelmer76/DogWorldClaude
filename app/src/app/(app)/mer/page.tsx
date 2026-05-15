@@ -33,7 +33,7 @@ const sections: MerSection[] = [
         sub: "Importer fra et annet nettsted, prøv ny mal",
       },
       {
-        href: "/mer",
+        href: "/mer/etikk",
         label: "Etikk-erklæring",
         sub: "Bekreft hvert annet måned for +50 karma",
         badge: { text: "Mangler", tone: "warning" },
