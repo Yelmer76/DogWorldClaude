@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
-import { DemoNav } from "@/components/shell/DemoNav";
 import "./globals.css";
 
 // Brand fonts — Inter for everything UI, JetBrains Mono for credentials/dates/numbers
@@ -36,10 +35,7 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen flex flex-col">
-        {children}
-        <DemoNav />
-      </body>
+      <body className="min-h-screen flex flex-col">{children}</body>
     </html>
   );
 }

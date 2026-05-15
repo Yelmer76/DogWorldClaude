@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
-import { dogs, granheim } from "@/data/universe";
+import { dogs } from "@/data/universe";
 import { ToastProvider, useToast } from "@/components/dogworld/ToastProvider";
+import { AppHeader } from "@/components/shell/AppHeader";
 import { usePedigreeNav } from "@/components/pedigree/usePedigreeNav";
 import { Breadcrumb } from "@/components/pedigree/Breadcrumb";
 import { PedigreeNodeCard } from "@/components/pedigree/PedigreeNodeCard";
@@ -92,37 +92,36 @@ function PedigreeInner() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-page">
-      {/* Top bar */}
-      <header className="bg-bg-card border-b border-n-100">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
-            <Link
-              href="/"
-              className="text-sm text-forest-700 hover:text-forest-900 transition-colors flex-shrink-0"
-            >
-              ← Tilbake
-            </Link>
-            <span className="text-n-300" aria-hidden>
-              ·
-            </span>
-            <span className="text-sm font-semibold text-n-950 truncate">
-              Stamtavle-utforsker
-            </span>
-            <span className="text-xs text-n-500 font-mono hidden md:inline truncate">
-              {granheim.name}
-            </span>
-          </div>
+    <div className="flex-1 flex flex-col bg-bg-page">
+      <AppHeader
+        rightSlot={
+          <button
+            type="button"
+            onClick={() => showToast("→ Del stamtavlen (kommer senere)", "info")}
+            aria-label="Del stamtavlen"
+            className="w-9 h-9 rounded-md grid place-items-center text-n-700 hover:bg-n-50 -mr-1.5"
+          >
+            <ShareIcon />
+          </button>
+        }
+      />
+
+      {/* Desktop title row */}
+      <div className="hidden md:block bg-bg-card border-b border-n-100">
+        <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between">
+          <h1 className="m-0 text-base font-semibold text-n-950">
+            Stamtavle-utforsker
+          </h1>
           <button
             type="button"
             onClick={() => showToast("→ Del stamtavlen (kommer senere)", "info")}
             className="text-sm text-forest-700 hover:text-forest-900 inline-flex items-center gap-1.5"
           >
             <ShareIcon />
-            <span className="hidden sm:inline">Del</span>
+            Del
           </button>
         </div>
-      </header>
+      </div>
 
       {/* Breadcrumb row */}
       <div className="bg-bg-page border-b border-n-100">

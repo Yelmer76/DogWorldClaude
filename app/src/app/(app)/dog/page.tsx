@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
-import { dogs, granheim, type Dog, type DogStatus } from "@/data/universe";
+import { dogs, type Dog, type DogStatus } from "@/data/universe";
+import { AppHeader } from "@/components/shell/AppHeader";
 import { DogHero } from "@/components/dog-detail/DogHero";
 import { DogNameBlock } from "@/components/dog-detail/DogNameBlock";
 import { TabBar, type TabKey } from "@/components/dog-detail/TabBar";
@@ -129,23 +129,10 @@ function DogDetailModeBody({
   const photoCount = isSparse ? 0 : 47;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-page">
-      {/* Top utility bar */}
-      <div className="bg-bg-card border-b border-n-100">
-        <div className="max-w-3xl xl:max-w-[1180px] mx-auto px-4 md:px-6 py-2 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm text-forest-700 hover:text-forest-900 transition-colors inline-flex items-center gap-1"
-          >
-            ← Tilbake
-          </Link>
-          <span className="text-xs text-n-500 font-mono">
-            {granheim.name} · Sprint 3 forhåndsvisning
-          </span>
-        </div>
-      </div>
+    <div className="flex-1 flex flex-col bg-bg-page">
+      <AppHeader />
 
-      {/* Dev-mode switcher (removes once Sprint 4 routes per dog) */}
+      {/* Dev-mode switcher (kommer ut når Sprint 11 ruter per hund) */}
       <DevModeSwitcher mode={mode} onChange={setMode} />
 
       {/* Desktop layout: detail + right pane */}

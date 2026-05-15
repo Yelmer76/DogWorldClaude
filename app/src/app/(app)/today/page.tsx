@@ -2,6 +2,7 @@
 
 import { ToastProvider } from "@/components/dogworld/ToastProvider";
 import { CameraFab } from "@/components/dog-detail/CameraFab";
+import { AppHeader } from "@/components/shell/AppHeader";
 import { TodayHeader } from "@/components/today/TodayHeader";
 import { TodaySidebar } from "@/components/today/TodaySidebar";
 import { FeedCard } from "@/components/today/FeedCard";
@@ -18,7 +19,8 @@ import { todayFeed } from "@/components/today/todayData";
 export default function TodayPage() {
   return (
     <ToastProvider>
-      <div className="min-h-screen flex flex-col bg-bg-page">
+      <div className="flex-1 flex flex-col bg-bg-page">
+        <AppHeader />
         <TodayHeader />
 
         <main className="flex-1">

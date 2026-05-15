@@ -5,6 +5,7 @@ import { DogPhoto } from "@/components/dogworld/DogPhoto";
 import { TitleBadge, Tag } from "@/components/dogworld/Tag";
 import { Button } from "@/components/ui/Button";
 import { ToastProvider, useToast } from "@/components/dogworld/ToastProvider";
+import { AppHeader } from "@/components/shell/AppHeader";
 import {
   granheimPublic,
   kennelNavItems,
@@ -32,21 +33,8 @@ function KennelInner() {
   const k = granheimPublic;
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-page">
-      {/* Top bar */}
-      <header className="bg-bg-card border-b border-n-100">
-        <div className="max-w-[1100px] mx-auto px-4 md:px-6 py-2 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm text-forest-700 hover:text-forest-900 inline-flex items-center gap-1"
-          >
-            ← Tilbake
-          </Link>
-          <span className="text-xs text-n-500 font-mono">
-            Offentlig kennelside
-          </span>
-        </div>
-      </header>
+    <div className="flex-1 flex flex-col bg-bg-page">
+      <AppHeader />
 
       {/* Hero */}
       <section className="bg-gradient-to-b from-forest-50 to-bg-page border-b border-n-100">

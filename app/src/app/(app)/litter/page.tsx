@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { dogs, granheim, litterC, puppies } from "@/data/universe";
+import { dogs, litterC, puppies } from "@/data/universe";
+import { AppHeader } from "@/components/shell/AppHeader";
 import { ToastProvider } from "@/components/dogworld/ToastProvider";
 import { CameraFab } from "@/components/dog-detail/CameraFab";
 import { Tag } from "@/components/dogworld/Tag";
@@ -33,21 +33,8 @@ function LitterInner() {
   const dam = dogs[litterC.damId];
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-page">
-      {/* Top bar */}
-      <header className="bg-bg-card border-b border-n-100">
-        <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-2 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm text-forest-700 hover:text-forest-900 inline-flex items-center gap-1"
-          >
-            ← Tilbake
-          </Link>
-          <span className="text-xs text-n-500 font-mono">
-            {granheim.name} · Kull-detaljer
-          </span>
-        </div>
-      </header>
+    <div className="flex-1 flex flex-col bg-bg-page">
+      <AppHeader />
 
       {/* Hero */}
       <section className="bg-bg-card border-b border-n-100">
