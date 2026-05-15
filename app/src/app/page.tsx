@@ -17,10 +17,16 @@ export default function Home() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/styleguide"
+            href="/dog"
             className="inline-flex items-center justify-center px-6 py-3 bg-ochre-600 text-white rounded-md hover:bg-ochre-700 transition-colors font-medium"
           >
-            Se designsystemet →
+            Åpne hund-detalj (Astor) →
+          </Link>
+          <Link
+            href="/styleguide"
+            className="inline-flex items-center justify-center px-6 py-3 bg-bg-card border border-n-200 text-n-950 rounded-md hover:bg-n-50 transition-colors font-medium"
+          >
+            Se designsystemet
           </Link>
         </div>
 
