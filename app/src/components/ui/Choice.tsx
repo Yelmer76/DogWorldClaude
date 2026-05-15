@@ -96,9 +96,19 @@ type ToggleProps = {
   state?: "off" | "on" | "disabled";
   children?: ReactNode;
   className?: string;
+  /** When provided, renders as an interactive button that fires on click */
+  onChange?: () => void;
+  /** Accessible label when no visible children */
+  ariaLabel?: string;
 };
 
-export function Toggle({ state = "off", children, className = "" }: ToggleProps) {
+export function Toggle({
+  state = "off",
+  children,
+  className = "",
+  onChange,
+  ariaLabel,
+}: ToggleProps) {
   const isOn = state === "on";
   const isDisabled = state === "disabled";
 
@@ -111,15 +121,48 @@ export function Toggle({ state = "off", children, className = "" }: ToggleProps)
     "absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-[0_1px_2px_rgba(26,26,26,0.04),0_1px_1px_rgba(26,26,26,0.03)] transition-[left] duration-150";
   const knobPos = isOn ? "left-[18px]" : "left-0.5";
 
+  // Interactive variant — used in profile/settings
+  if (onChange) {
+    return (
+      <button
+        type="button"
+        role="switch"
+        aria-checked={isOn}
+        aria-label={ariaLabel}
+        disabled={isDisabled}
+        onClick={onChange}
+        className={
+          "inline-flex items-center gap-3 text-sm focus-visible:outline-2 focus-visible:outline-forest-500 focus-visible:outline-offset-2 rounded-full " +
+          (isDisabled
+            ? "text-n-500 cursor-not-allowed "
+            : "text-n-950 cursor-pointer ") +
+          className
+        }
+      >
+        <span className={`${trackBase} ${trackColor} ${trackOpacity}`}>
+          <span className={`${knobBase} ${knobPos}`} />
+        </span>
+        {children && <span>{children}</span>}
+      </button>
+    );
+  }
+
+  // Display-only variant — used in styleguide demos
   return (
     <span
       className={
         "inline-flex items-center gap-3 text-sm " +
-        (isDisabled ? "text-n-500 cursor-not-allowed " : "text-n-950 cursor-pointer ") +
+        (isDisabled
+          ? "text-n-500 cursor-not-allowed "
+          : "text-n-950 cursor-pointer ") +
         className
       }
     >
-      <span className={`${trackBase} ${trackColor} ${trackOpacity}`} role="switch" aria-checked={isOn}>
+      <span
+        className={`${trackBase} ${trackColor} ${trackOpacity}`}
+        role="switch"
+        aria-checked={isOn}
+      >
         <span className={`${knobBase} ${knobPos}`} />
       </span>
       {children && <span>{children}</span>}

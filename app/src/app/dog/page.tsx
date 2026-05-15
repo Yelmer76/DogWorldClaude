@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { dogs, granheim } from "@/data/universe";
+import { dogs, granheim, type Dog } from "@/data/universe";
 import { DogHero } from "@/components/dog-detail/DogHero";
 import { DogNameBlock } from "@/components/dog-detail/DogNameBlock";
 import { TabBar, type TabKey } from "@/components/dog-detail/TabBar";
+import { ProfilTab } from "@/components/dog-detail/ProfilTab";
+import { ToastProvider } from "@/components/dogworld/ToastProvider";
 
 /**
  * Dog Detail screen — Sprint 3.
@@ -13,19 +15,34 @@ import { TabBar, type TabKey } from "@/components/dog-detail/TabBar";
  * Sprint 4 when the database is wired up.
  */
 export default function DogDetailPage() {
+  return (
+    <ToastProvider>
+      <DogDetailInner />
+    </ToastProvider>
+  );
+}
+
+function DogDetailInner() {
   // Local mutable copy of Astor so inline edits feel real (re-render on save)
-  const [dog, setDog] = useState(dogs.astor);
+  const [dog, setDog] = useState<Dog>(dogs.astor);
   const [activeTab, setActiveTab] = useState<TabKey>("profil");
   const [publicVisible, setPublicVisible] = useState(
     dog.publicVisible ?? true,
+  );
+  const [sharedToGenealogy, setSharedToGenealogy] = useState(
+    dog.sharedToGenealogy ?? true,
   );
 
   const sex = dog.sex;
   const ageText = computeAgeText(dog.born);
 
+  function updateDog(patch: Partial<Dog>) {
+    setDog((d) => ({ ...d, ...patch }));
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-bg-page">
-      {/* Top utility bar — keeps a path back to the rest of the app */}
+      {/* Top utility bar */}
       <div className="bg-bg-card border-b border-n-100">
         <div className="max-w-3xl mx-auto px-4 md:px-6 py-2 flex items-center justify-between">
           <Link
@@ -63,21 +80,34 @@ export default function DogDetailPage() {
           titles={dog.titles}
           publicVisible={publicVisible}
           onCallNameSave={(next) =>
-            setDog((d) => ({ ...d, callName: next || undefined }))
+            updateDog({ callName: next.trim() ? next.trim() : undefined })
           }
           onPublicToggle={() => setPublicVisible((v) => !v)}
         />
 
         <TabBar activeKey={activeTab} onChange={setActiveTab} />
 
-        {/* Tab content — placeholders in Sprint 3A; real content in 3B–3D */}
         <section
           id={`panel-${activeTab}`}
           role="tabpanel"
           aria-labelledby={`tab-${activeTab}`}
           className="px-4 md:px-6 py-6 min-h-[240px]"
         >
-          <PlaceholderPanel tab={activeTab} />
+          {activeTab === "profil" ? (
+            <ProfilTab
+              dog={dog}
+              publicVisible={publicVisible}
+              sharedToGenealogy={sharedToGenealogy}
+              onUpdate={updateDog}
+              onPublicToggle={() => setPublicVisible((v) => !v)}
+              onSharedToggle={() => setSharedToGenealogy((v) => !v)}
+              onStatusClick={() => {
+                /* status sheet arrives in Sprint 3E */
+              }}
+            />
+          ) : (
+            <PlaceholderPanel tab={activeTab} />
+          )}
         </section>
       </article>
     </div>
@@ -87,8 +117,8 @@ export default function DogDetailPage() {
 function PlaceholderPanel({ tab }: { tab: TabKey }) {
   const labels: Record<TabKey, { title: string; sub: string }> = {
     profil: {
-      title: "Profil-fanen kommer i Sprint 3B",
-      sub: "5 seksjoner med inline-redigering: Grunnleggende, Foreldre, Oppdretter og eier, Personlighet, Status og synlighet.",
+      title: "Profil-fanen",
+      sub: "Skal være synlig nå.",
     },
     stamtavle: {
       title: "Stamtavle-fanen kommer i Sprint 3D",
