@@ -34,6 +34,19 @@ Only escalate to Ole when:
 
 Never escalate "is it working?" — find out yourself first.
 
+## Windows + PowerShell quirks (working environment)
+
+This machine runs Windows PowerShell 5.1. Two things bite if forgotten:
+
+- **Multi-line `git commit -m`** — passing a here-string (`@'...'@`) directly as the `-m` value tokenizes broken (newlines + dashes get split into separate pathspecs). Use a temp message file instead:
+  ```powershell
+  Set-Content .git/COMMIT_EDITMSG_X "your message" -Encoding utf8
+  git commit -F .git/COMMIT_EDITMSG_X
+  Remove-Item .git/COMMIT_EDITMSG_X -Force
+  ```
+  Or assign the here-string to a `$msg` variable first and pass `$msg` as the argument — both avoid the inline tokenization issue.
+- **No `&&` operator** — chain with `;` (always runs next) or `; if ($?) { ... }` (only on success).
+
 ## Brand placeholder
 
 The product name "DogWorld" is a working title only. **Use `DogWorld(tmp)` in all code, UI strings, copy, and documentation** until the founder locks the final brand and trademark. When the brand changes, it changes once across the codebase via i18n keys / constants.
