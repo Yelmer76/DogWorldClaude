@@ -10,10 +10,15 @@ import { NavIcon } from "./NavIcon";
  * Hidden on mobile where the BottomTabBar takes over.
  *
  * Width = 80px (icon-only). Tooltips on hover give labels.
- * Brand mark at top, primary nav, then "user chip" placeholder
- * at the bottom.
+ * Brand mark at top, primary nav, then logged-in user chip at the
+ * bottom (initial + tooltip with full name).
  */
-export function SideRail() {
+export type SideRailProps = {
+  userInitial?: string;
+  userName?: string;
+};
+
+export function SideRail({ userInitial = "?", userName }: SideRailProps) {
   const pathname = usePathname();
   const active = activeNav(pathname);
 
@@ -71,9 +76,9 @@ export function SideRail() {
         href="/mer"
         aria-label="Profil"
         className="w-10 h-10 rounded-full bg-n-100 text-n-700 grid place-items-center font-medium text-sm hover:bg-n-200 transition-colors"
-        title="Marit · Granheim"
+        title={userName ?? "Profil"}
       >
-        M
+        {userInitial}
       </Link>
     </nav>
   );

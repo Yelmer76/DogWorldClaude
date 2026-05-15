@@ -214,6 +214,38 @@ export const applicationMatches = sqliteTable("application_matches", {
   status: text("status", { enum: ["ok", "warn", "err"] }).notNull(),
 });
 
+// ── Users + sessions (Sprint 14 magic-link auth) ───────────────────────────
+
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  kennelId: text("kennel_id").references(() => kennels.id, {
+    onDelete: "set null",
+  }),
+  createdAt: text("created_at").notNull(),
+});
+
+export const sessions = sqliteTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expiresAt: text("expires_at").notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
+/**
+ * Single-use magic-link tokens. Sprint 14 prints these in the dev
+ * console; Sprint 15 will email them via Resend.
+ */
+export const magicTokens = sqliteTable("magic_tokens", {
+  token: text("token").primaryKey(),
+  email: text("email").notNull(),
+  expiresAt: text("expires_at").notNull(),
+  consumedAt: text("consumed_at"),
+});
+
 // ── Inferred row types ─────────────────────────────────────────────────────
 
 export type KennelRow = typeof kennels.$inferSelect;
@@ -225,3 +257,6 @@ export type LitterRow = typeof litters.$inferSelect;
 export type PuppyRow = typeof puppies.$inferSelect;
 export type ApplicationRow = typeof applications.$inferSelect;
 export type ApplicationMatchRow = typeof applicationMatches.$inferSelect;
+export type UserRow = typeof users.$inferSelect;
+export type SessionRow = typeof sessions.$inferSelect;
+export type MagicTokenRow = typeof magicTokens.$inferSelect;

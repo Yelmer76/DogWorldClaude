@@ -1,16 +1,14 @@
-"use client";
-
 import Link from "next/link";
 import { granheim } from "@/data/universe";
 import { Tag } from "@/components/dogworld/Tag";
 import { AppHeader } from "@/components/shell/AppHeader";
+import { getCurrentUser } from "@/lib/auth";
 
 type MerLink = {
   href: string;
   label: string;
   sub?: string;
   badge?: { text: string; tone: "warning" | "success" | "info" | "neutral" };
-  external?: boolean;
 };
 
 type MerSection = {
@@ -18,70 +16,92 @@ type MerSection = {
   items: MerLink[];
 };
 
-const sections: MerSection[] = [
-  {
-    title: "Kennelen din",
-    items: [
-      {
-        href: "/kennel",
-        label: "Offentlig kennelside",
-        sub: "Slik ser kjøpere og dommere kennelen din",
-      },
-      {
-        href: "/onboarding",
-        label: "Kjør onboarding på nytt",
-        sub: "Importer fra et annet nettsted, prøv ny mal",
-      },
-      {
-        href: "/mer/etikk",
-        label: "Etikk-erklæring",
-        sub: "Bekreft hvert annet måned for +50 karma",
-        badge: { text: "Mangler", tone: "warning" },
-      },
-    ],
-  },
-  {
-    title: "Profil og tilgang",
-    items: [
-      { href: "/mer", label: "Min profil", sub: "Marit Granheim · Eier" },
-      {
-        href: "/mer",
-        label: "Innloggings-metoder",
-        sub: "Passkey · magic link · 2FA",
-      },
-      { href: "/mer", label: "Inviter samarbeidspartner" },
-    ],
-  },
-  {
-    title: "Karma og utmerkelser",
-    items: [
-      {
-        href: "/mer",
-        label: "Karma-historikk",
-        sub: "Sølv-tier · 2 850 poeng totalt",
-        badge: { text: "+50 i dag", tone: "success" },
-      },
-      { href: "/mer", label: "Etiske utmerkelser" },
-    ],
-  },
-  {
-    title: "Utvikler",
-    items: [
-      { href: "/styleguide", label: "Designsystem", sub: "Komponent-bibliotek" },
-      { href: "/start", label: "Sprint-galleri", sub: "Sprint 3-9 oversikt med skjermbeskrivelser" },
-    ],
-  },
-  {
-    title: "Konto",
-    items: [
-      { href: "/mer", label: "Personvern og data" },
-      { href: "/mer", label: "Hjelp og kontakt" },
-      { href: "/mer", label: "Logg ut", badge: { text: "—", tone: "neutral" } },
-    ],
-  },
-];
+export default async function MerPage() {
+  const user = await getCurrentUser();
+  const initial = (user?.name?.match(/\b\w/g) ?? [user?.email?.[0] ?? "?"])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
-export default function MerPage() {
+  const sections: MerSection[] = [
+    {
+      title: "Kennelen din",
+      items: [
+        {
+          href: "/kennel",
+          label: "Offentlig kennelside",
+          sub: "Slik ser kjøpere og dommere kennelen din",
+        },
+        {
+          href: "/onboarding",
+          label: "Kjør onboarding på nytt",
+          sub: "Importer fra et annet nettsted, prøv ny mal",
+        },
+        {
+          href: "/mer/etikk",
+          label: "Etikk-erklæring",
+          sub: "Bekreft hvert annet måned for +50 karma",
+          badge: { text: "Mangler", tone: "warning" },
+        },
+      ],
+    },
+    {
+      title: "Profil og tilgang",
+      items: [
+        {
+          href: "/mer",
+          label: "Min profil",
+          sub: `${user?.name ?? "Ukjent"} · ${user?.email ?? ""}`,
+        },
+        {
+          href: "/mer",
+          label: "Innloggings-metoder",
+          sub: "Magic link · passkey + 2FA kommer Sprint 16",
+        },
+        { href: "/mer", label: "Inviter samarbeidspartner" },
+      ],
+    },
+    {
+      title: "Karma og utmerkelser",
+      items: [
+        {
+          href: "/mer",
+          label: "Karma-historikk",
+          sub: "Sølv-tier · 2 850 poeng totalt",
+          badge: { text: "+50 i dag", tone: "success" },
+        },
+        { href: "/mer", label: "Etiske utmerkelser" },
+      ],
+    },
+    {
+      title: "Utvikler",
+      items: [
+        {
+          href: "/styleguide",
+          label: "Designsystem",
+          sub: "Komponent-bibliotek",
+        },
+        {
+          href: "/start",
+          label: "Sprint-galleri",
+          sub: "Sprint 3-9 oversikt med skjermbeskrivelser",
+        },
+      ],
+    },
+    {
+      title: "Konto",
+      items: [
+        { href: "/mer", label: "Personvern og data" },
+        { href: "/mer", label: "Hjelp og kontakt" },
+        {
+          href: "/auth/logout",
+          label: "Logg ut",
+          sub: user?.email,
+        },
+      ],
+    },
+  ];
+
   return (
     <>
       <AppHeader />
@@ -92,14 +112,14 @@ export default function MerPage() {
             aria-hidden
             className="w-12 h-12 rounded-full bg-forest-50 text-forest-700 grid place-items-center font-medium text-lg"
           >
-            M
+            {initial}
           </span>
           <div className="flex-1 min-w-0">
             <div className="text-base font-semibold text-n-950 leading-tight">
-              Marit Granheim
+              {user?.name ?? "Ukjent bruker"}
             </div>
             <div className="text-xs text-n-500 mt-0.5">
-              {granheim.name} · Lillehammer
+              {granheim.name} · {granheim.city}
             </div>
           </div>
           <Tag variant="forest" dot>

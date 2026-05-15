@@ -8,6 +8,13 @@
       "when": 1778847995265,
       "tag": "0000_faithful_slyde",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1778848283093,
+      "tag": "0001_harsh_wasp",
+      "breakpoints": true
     }
   ]
 }

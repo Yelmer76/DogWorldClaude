@@ -28,6 +28,9 @@ async function seed() {
   console.log("Seeding DogWorld(tmp) test universe…");
 
   // ── Wipe in dependency order ───────────────────────────────────────────
+  db.delete(schema.magicTokens).run();
+  db.delete(schema.sessions).run();
+  db.delete(schema.users).run();
   db.delete(schema.applicationMatches).run();
   db.delete(schema.applications).run();
   db.delete(schema.puppies).run();
@@ -201,7 +204,30 @@ async function seed() {
   console.log(`  ✓ ${applicationFixtures.length} applications`);
   console.log(`  ✓ ${matchCount} match indicators`);
 
+  // ── Seed users (Sprint 14) ──────────────────────────────────────────────
+  const now = new Date().toISOString();
+  db.insert(schema.users)
+    .values([
+      {
+        id: "user-ole",
+        email: "ole@granheim.no",
+        name: "Ole Granheim",
+        kennelId: granheim.id,
+        createdAt: now,
+      },
+      {
+        id: "user-marit",
+        email: "marit@granheim.no",
+        name: "Marit Granheim",
+        kennelId: granheim.id,
+        createdAt: now,
+      },
+    ])
+    .run();
+  console.log("  ✓ 2 users (Ole, Marit)");
+
   console.log("\nDone. Test the db with: npm run db:studio");
+  console.log("Login locally: visit /login and enter ole@granheim.no");
 }
 
 seed().catch((err) => {
