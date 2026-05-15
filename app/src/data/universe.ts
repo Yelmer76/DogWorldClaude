@@ -69,6 +69,8 @@ export type Dog = {
   personality?: string;
   publicVisible?: boolean;
   sharedToGenealogy?: boolean;
+  /** Privacy opt-out — name redacted, no drill-down (genealogy-tree edge case) */
+  hidden?: boolean;
 };
 
 // ── Puppies in a litter ────────────────────────────────────────────────────
@@ -229,7 +231,7 @@ export const dogs: Record<string, Dog> = {
     sireId: "bobby",
     damId: "saga",
     siblingIds: ["birk-sib", "frigg-sib", "ulf-sib", "nora-sib"],
-    offspringIds: ["mira", "loke", "idun"],
+    offspringIds: ["mira-a", "loke-a", "idun-a"],
     health: {
       HD: { value: "A (FCI)", status: "ok", scheme: "FCI", date: "2023-09-12" },
       ED: { value: "0", status: "ok", scheme: "FCI", date: "2023-09-12" },
@@ -402,7 +404,198 @@ export const dogs: Record<string, Dog> = {
     publicVisible: true,
     sharedToGenealogy: true,
   },
+
+  // ── Sprint 4: extra ancestors needed by Pedigree Explorer ─────────────────
+
+  frida: {
+    id: "frida",
+    titles: ["SUCH"],
+    name: "Frida av Lia",
+    callName: "Frida",
+    sex: "f",
+    breed: "Norsk Elghund",
+    country: "SE",
+    born: "2015-04-12",
+    breeder: "Kennel av Lia",
+    sireId: null,
+    damId: null,
+    siblingIds: [],
+    offspringIds: ["bobby"],
+    health: {
+      HD: { value: "A", status: "ok", scheme: "FCI" },
+      ED: { value: "0", status: "ok", scheme: "FCI" },
+      Eyes: { value: "Klar 06/24", status: "ok", scheme: "ECVO" },
+      DM: { value: "N / N", status: "ok", scheme: "Laboklin" },
+    },
+    achievements: [
+      { y: "'19", t: "SUCH bekreftet" },
+      { y: "'18", t: "Best Brood Bitch · SKK" },
+    ],
+    status: "retired",
+    publicVisible: true,
+    sharedToGenealogy: true,
+  },
+
+  tora: {
+    id: "tora",
+    titles: ["NUCH"],
+    name: "Tora vom Nordwald",
+    callName: "Tora",
+    sex: "f",
+    breed: "Norsk Elghund",
+    country: "DE",
+    born: "2016-07-18",
+    breeder: "vom Nordwald",
+    sireId: null,
+    damId: null,
+    siblingIds: [],
+    offspringIds: ["saga"],
+    health: {
+      HD: { value: "A", status: "ok", scheme: "FCI" },
+      ED: { value: "0", status: "ok", scheme: "FCI" },
+      Eyes: { value: "Klar 08/25", status: "ok", scheme: "ECVO" },
+      DM: { value: "N / N", status: "ok", scheme: "Laboklin" },
+    },
+    achievements: [{ y: "'21", t: "NUCH bekreftet" }],
+    status: "retired",
+    publicVisible: true,
+    sharedToGenealogy: true,
+  },
+
+  // Astor's adult offspring (Litter A 2024) — distinct IDs from current Litter C puppies
+  "mira-a": {
+    id: "mira-a",
+    titles: ["NUCH"],
+    name: "Mira av Granheim",
+    callName: "Mira",
+    sex: "f",
+    breed: "Norsk Elghund",
+    country: "NO",
+    born: "2024-04-22",
+    breeder: "Kennel Granheim",
+    sireId: "astor",
+    damId: "saga-2", // edge case: dam record privacy-hidden by previous owner
+    siblingIds: ["loke-a", "idun-a"],
+    offspringIds: [],
+    health: {
+      HD: { value: "A", status: "ok", scheme: "FCI" },
+      ED: { value: "0", status: "ok", scheme: "FCI" },
+      Eyes: { value: "Klar 04/25", status: "ok", scheme: "ECVO" },
+      DM: { value: "N / N", status: "ok", scheme: "Laboklin" },
+    },
+    achievements: [
+      { y: "'25", t: "NUCH bekreftet ved 14 mnd" },
+      { y: "'25", t: "BOB Junior · NKK Oslo" },
+    ],
+    status: "active",
+    publicVisible: true,
+    sharedToGenealogy: true,
+  },
+  "loke-a": minimalDog("loke-a", "Loke av Granheim", "m", "2024-04-22", {
+    sireId: "astor",
+    damId: "saga-2",
+    siblingIds: ["mira-a", "idun-a"],
+  }),
+  "idun-a": minimalDog("idun-a", "Idun av Granheim", "f", "2024-04-22", {
+    sireId: "astor",
+    damId: "saga-2",
+    siblingIds: ["mira-a", "loke-a"],
+  }),
+
+  // Astor's siblings (same litter, Bobby × Saga 2022)
+  "birk-sib": minimalDog("birk-sib", "Birk av Skogen", "m", "2022-03-14", {
+    sireId: "bobby",
+    damId: "saga",
+    siblingIds: ["frigg-sib", "ulf-sib", "nora-sib"],
+  }),
+  "frigg-sib": minimalDog("frigg-sib", "Frigg av Skogen", "f", "2022-03-14", {
+    sireId: "bobby",
+    damId: "saga",
+    siblingIds: ["birk-sib", "ulf-sib", "nora-sib"],
+  }),
+  "ulf-sib": minimalDog("ulf-sib", "Ulf av Skogen", "m", "2022-03-14", {
+    sireId: "bobby",
+    damId: "saga",
+    siblingIds: ["birk-sib", "frigg-sib", "nora-sib"],
+  }),
+  "nora-sib": minimalDog("nora-sib", "Nora av Skogen", "f", "2022-03-14", {
+    sireId: "bobby",
+    damId: "saga",
+    siblingIds: ["birk-sib", "frigg-sib", "ulf-sib"],
+  }),
+
+  // ── Edge cases for genealogy edge-case panels ──────────────────────────────
+  "hidden-1": {
+    id: "hidden-1",
+    titles: [],
+    name: "Skjult etter eierens valg",
+    sex: "f",
+    breed: "Norsk Elghund",
+    country: "NO",
+    born: "1900-01-01",
+    breeder: "—",
+    sireId: null,
+    damId: null,
+    siblingIds: [],
+    offspringIds: [],
+    health: {},
+    achievements: [],
+    status: "retired",
+    hidden: true,
+    publicVisible: false,
+    sharedToGenealogy: false,
+  },
+  "saga-2": {
+    id: "saga-2",
+    titles: [],
+    name: "Skjult etter eierens valg",
+    sex: "f",
+    breed: "Norsk Elghund",
+    country: "NO",
+    born: "1900-01-01",
+    breeder: "—",
+    sireId: null,
+    damId: null,
+    siblingIds: [],
+    offspringIds: [],
+    health: {},
+    achievements: [],
+    status: "retired",
+    hidden: true,
+    publicVisible: false,
+    sharedToGenealogy: false,
+  },
 };
+
+// ── Helper for compact placeholder dogs (siblings, minor offspring) ─────────
+function minimalDog(
+  id: string,
+  name: string,
+  sex: Sex,
+  born: string,
+  extra: Partial<Dog>,
+): Dog {
+  return {
+    id,
+    titles: [],
+    name,
+    sex,
+    breed: "Norsk Elghund",
+    country: "NO",
+    born,
+    breeder: "Kennel Granheim",
+    sireId: null,
+    damId: null,
+    siblingIds: [],
+    offspringIds: [],
+    health: {},
+    achievements: [],
+    status: "active",
+    publicVisible: true,
+    sharedToGenealogy: true,
+    ...extra,
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────
 // Litter C — "Stars of the Fjord", Astor × Bella
