@@ -9,6 +9,9 @@ import { TabBar, type TabKey } from "@/components/dog-detail/TabBar";
 import { ProfilTab } from "@/components/dog-detail/ProfilTab";
 import { HelseTab } from "@/components/dog-detail/HelseTab";
 import { TitlerTab } from "@/components/dog-detail/TitlerTab";
+import { StamtavleTab } from "@/components/dog-detail/StamtavleTab";
+import { BilderTab } from "@/components/dog-detail/BilderTab";
+import { NotaterTab } from "@/components/dog-detail/NotaterTab";
 import { ToastProvider } from "@/components/dogworld/ToastProvider";
 
 /**
@@ -110,50 +113,11 @@ function DogDetailInner() {
           )}
           {activeTab === "helse" && <HelseTab dog={dog} />}
           {activeTab === "titler" && <TitlerTab dog={dog} />}
-          {(activeTab === "stamtavle" ||
-            activeTab === "bilder" ||
-            activeTab === "notater") && <PlaceholderPanel tab={activeTab} />}
+          {activeTab === "stamtavle" && <StamtavleTab dog={dog} />}
+          {activeTab === "bilder" && <BilderTab dog={dog} />}
+          {activeTab === "notater" && <NotaterTab dog={dog} />}
         </section>
       </article>
-    </div>
-  );
-}
-
-function PlaceholderPanel({ tab }: { tab: TabKey }) {
-  const labels: Record<TabKey, { title: string; sub: string }> = {
-    profil: {
-      title: "Profil-fanen",
-      sub: "Skal være synlig nå.",
-    },
-    stamtavle: {
-      title: "Stamtavle-fanen kommer i Sprint 3D",
-      sub: "3-generasjons mini-tre forankret på denne hunden + avkom-liste.",
-    },
-    helse: {
-      title: "Helse-fanen kommer i Sprint 3C",
-      sub: "Strukturert helse-tabell + vaksine-grid + 7-måneders vekt-graf.",
-    },
-    titler: {
-      title: "Titler-fanen kommer i Sprint 3C",
-      sub: "Stats + kronologisk tidslinje gruppert per år.",
-    },
-    bilder: {
-      title: "Bilder-fanen kommer i Sprint 3D",
-      sub: "Album-chips + responsiv 4–6-kolonne grid.",
-    },
-    notater: {
-      title: "Notater-fanen kommer i Sprint 3D",
-      sub: "Tidsstemplet notat-komponist + private oppføringer.",
-    },
-  };
-  const { title, sub } = labels[tab];
-  return (
-    <div className="border border-dashed border-n-300 rounded-card p-8 text-center">
-      <p className="text-xs uppercase tracking-[0.06em] text-n-500 font-medium mb-2">
-        Pågående arbeid
-      </p>
-      <h3 className="text-lg font-semibold text-n-950 mb-2">{title}</h3>
-      <p className="text-sm text-n-700 max-w-md mx-auto">{sub}</p>
     </div>
   );
 }
