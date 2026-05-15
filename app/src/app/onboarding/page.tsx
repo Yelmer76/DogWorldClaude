@@ -764,7 +764,7 @@ function PublishedStep() {
           href="/dog/astor"
         />
         <NextStep n="2" t="Bekreft etikk-erklæringen (+50 karma)" href="/today" />
-        <NextStep n="3" t="Inviter første valpekjøper" href="/litter" />
+        <NextStep n="3" t="Inviter første valpekjøper" href="/kull" />
       </div>
 
       <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">

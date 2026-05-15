@@ -14,8 +14,8 @@ import { BottomTabBar } from "@/components/shell/BottomTabBar";
  *   sessions (cookie present but session row deleted/expired)
  * - Mobile: BottomTabBar fixed to bottom; Desktop: SideRail sticky-left
  *
- * Out-of-shell routes (/, /login, /onboarding, /styleguide, /start)
- * live at the root `app/` level and bypass this layout.
+ * Out-of-shell routes (/, /login, /onboarding, /styleguide) live at
+ * the root `app/` level and bypass this layout.
  */
 export default async function AppShellLayout({
   children,

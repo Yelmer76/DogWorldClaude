@@ -74,21 +74,6 @@ export default async function MerPage() {
       ],
     },
     {
-      title: "Utvikler",
-      items: [
-        {
-          href: "/styleguide",
-          label: "Designsystem",
-          sub: "Komponent-bibliotek",
-        },
-        {
-          href: "/start",
-          label: "Sprint-galleri",
-          sub: "Sprint 3-9 oversikt med skjermbeskrivelser",
-        },
-      ],
-    },
-    {
       title: "Konto",
       items: [
         { href: "/mer", label: "Personvern og data" },

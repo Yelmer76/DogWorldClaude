@@ -1,8 +1,9 @@
 /**
- * Edge middleware: gates the (app) route group behind a session
- * cookie. The cookie's existence is the only check here — full
- * session validation happens in the page via getCurrentUser(),
- * because the SQLite/D1 client doesn't run in the edge runtime.
+ * Edge proxy (Next.js 16 successor to "middleware"): gates the (app)
+ * route group behind a session cookie. The cookie's existence is the
+ * only check here — full session validation happens in the page via
+ * getCurrentUser(), because the SQLite/D1 client doesn't run in the
+ * edge runtime.
  */
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -12,7 +13,7 @@ const PROTECTED_PREFIXES = [
   "/today",
   "/hunder",
   "/dog",
-  "/litter",
+  "/kull",
   "/kennel",
   "/pedigree",
   "/mer",
@@ -24,7 +25,7 @@ function isProtected(pathname: string): boolean {
   );
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (!isProtected(pathname)) {
     return NextResponse.next();
@@ -45,6 +46,6 @@ export function middleware(req: NextRequest) {
 export const config = {
   // Skip Next.js internals + static assets + the auth/login routes themselves
   matcher: [
-    "/((?!_next|api/|auth/|login|onboarding|styleguide|start|favicon.ico).*)",
+    "/((?!_next|api/|auth/|login|onboarding|styleguide|favicon.ico).*)",
   ],
 };

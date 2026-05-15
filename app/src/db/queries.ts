@@ -42,6 +42,10 @@ export function getDog(id: string) {
 
 // ── Litters ────────────────────────────────────────────────────────────────
 
+export function listLitters() {
+  return db.select().from(litters).orderBy(desc(litters.whelpingDate)).all();
+}
+
 export function getLitter(id: string) {
   const row = db.select().from(litters).where(eq(litters.id, id)).get();
   if (!row) return null;
@@ -51,6 +55,24 @@ export function getLitter(id: string) {
     .where(eq(puppiesTable.litterId, id))
     .all();
   return { ...row, puppies: litterPuppies };
+}
+
+export function listSires() {
+  return db
+    .select()
+    .from(dogsTable)
+    .where(eq(dogsTable.sex, "m"))
+    .orderBy(dogsTable.name)
+    .all();
+}
+
+export function listDams() {
+  return db
+    .select()
+    .from(dogsTable)
+    .where(eq(dogsTable.sex, "f"))
+    .orderBy(dogsTable.name)
+    .all();
 }
 
 // ── Applications ───────────────────────────────────────────────────────────

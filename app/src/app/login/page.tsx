@@ -38,12 +38,9 @@ export default async function LoginPage({
   return (
     <main className="min-h-screen grid place-items-center bg-bg-page px-4">
       <div className="w-full max-w-[420px] bg-bg-card border border-n-200 rounded-card p-6 md:p-8 shadow-[0_1px_2px_rgba(26,26,26,0.04),0_1px_1px_rgba(26,26,26,0.03)]">
-        <Link
-          href="/start"
-          className="text-xs text-n-500 hover:text-n-700 inline-flex items-center gap-1 mb-6"
-        >
-          ← DogWorld(tmp)
-        </Link>
+        <div className="text-xs text-n-500 mb-6 inline-flex items-center gap-1">
+          DogWorld(tmp)
+        </div>
         <h1 className="m-0 text-2xl md:text-[28px] font-semibold tracking-[-0.015em] text-n-950">
           Logg inn
         </h1>

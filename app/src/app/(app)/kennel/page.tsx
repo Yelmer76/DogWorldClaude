@@ -278,7 +278,7 @@ function CurrentLitterCard() {
           >
             Se valpene
           </Button>
-          <Link href="/litter">
+          <Link href="/kull">
             <Button variant="secondary" size="sm">
               Følg kullets dagbok
             </Button>

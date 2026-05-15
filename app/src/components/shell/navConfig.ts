@@ -25,7 +25,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Hunder",
     matchPrefixes: ["/dog", "/pedigree"],
   },
-  { key: "kull", href: "/litter", label: "Kull" },
+  { key: "kull", href: "/kull", label: "Kull" },
   { key: "kennel", href: "/kennel", label: "Kennel" },
   { key: "mer", href: "/mer", label: "Mer" },
 ];
@@ -51,7 +51,9 @@ export function pageTitle(pathname: string): string {
   if (pathname === "/hunder") return "Hunder";
   if (pathname.startsWith("/dog")) return "Hund";
   if (pathname.startsWith("/pedigree")) return "Stamtavle";
-  if (pathname === "/litter") return "Kull C";
+  if (pathname === "/kull") return "Kull";
+  if (pathname === "/kull/nytt") return "Nytt kull";
+  if (pathname.startsWith("/kull/")) return "Kull";
   if (pathname === "/kennel") return "Offentlig kennel";
   if (pathname === "/mer") return "Mer";
   if (pathname.startsWith("/mer/")) return "Mer";

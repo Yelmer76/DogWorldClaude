@@ -70,7 +70,7 @@ export function TodaySidebar() {
           <ShortcutLink href="/hunder">Hunder — registret</ShortcutLink>
           <ShortcutLink href="/dog/astor">Astor — hund-detaljer</ShortcutLink>
           <ShortcutLink href="/pedigree">Stamtavle-utforsker</ShortcutLink>
-          <ShortcutLink href="/litter">Kull C — dagbok</ShortcutLink>
+          <ShortcutLink href="/kull">Kull-oversikten</ShortcutLink>
           <ShortcutLink href="/kennel">Offentlig kennelside</ShortcutLink>
         </ul>
       </section>
