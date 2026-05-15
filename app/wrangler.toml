@@ -27,11 +27,17 @@ main = ".open-next/worker.js"
 directory = ".open-next/assets"
 binding = "ASSETS"
 
+# Eksplisitt flagg slik at db-klienten vet at den kjører i Workers (D1)
+# istedenfor lokalt (better-sqlite3) — Workers har process.env men ikke
+# alltid CF_PAGES, så vi setter vårt eget flagg.
+[vars]
+DEPLOY_TARGET = "cloudflare"
+
 # D1-database — fyll inn database_id etter `wrangler d1 create dogworld-tmp`
 [[d1_databases]]
 binding = "DB"
 database_name = "dogworld-tmp"
-database_id = "FYLL_INN_ETTER_wrangler_d1_create"
+database_id = "2609dd87-b5b3-4904-a7f9-ca27286ede3d"
 migrations_dir = "drizzle"
 
 # Resend-nøkkel settes som secret, ikke i denne fila:

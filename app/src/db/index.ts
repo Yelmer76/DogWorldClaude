@@ -25,7 +25,19 @@ declare global {
   var __dogworldSqliteDb: ReturnType<typeof drizzleSqlite<typeof schema>> | undefined;
 }
 
-const isCloudflare = typeof process === "undefined" || !!process.env.CF_PAGES;
+// Detect whether we're running inside Cloudflare Workers. Several signals
+// because process.env vars vary between runtimes:
+//   - `caches.default` is a Cloudflare Workers global, never present in Node
+//   - DEPLOY_TARGET is set in wrangler.toml [vars]
+//   - CF_PAGES is set on classic Pages deploys
+const isCloudflare =
+  typeof process === "undefined" ||
+  process.env.DEPLOY_TARGET === "cloudflare" ||
+  !!process.env.CF_PAGES ||
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (typeof (globalThis as any).caches !== "undefined" &&
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    "default" in (globalThis as any).caches);
 
 function openSqlite() {
   // Lazy require so Cloudflare Workers bundles don't try to import a

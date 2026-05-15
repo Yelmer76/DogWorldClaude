@@ -9,23 +9,35 @@ import { Button } from "@/components/ui/Button";
 /**
  * /kull/nytt — plan a new litter. Server-action form: pick sire + dam,
  * choose mating date, get an auto-suggested next letter (A → B → C …).
- * On submit, inserts the new litter row and redirects to /kull/[id].
- *
- * Sprint 14b — minimal happy path. Validation, conflict checks
- * (overlapping litters per dam), and edit-after-create live in a
- * later iteration.
+ * On submit, validates the letter is not already used in the kennel,
+ * inserts the new litter row and redirects to /kull/[id].
  */
-export default async function NyttKullPage() {
+export default async function NyttKullPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; letter?: string }>;
+}) {
+  const params = await searchParams;
   const [sires, dams, existing] = await Promise.all([
     listSires(),
     listDams(),
     listLitters(),
   ]);
 
-  // Suggest next letter — D after A/B/C, etc.
+  // Suggest next letter — D after A/B/C, etc. Skip Q/X/Y/Z by convention
+  // (many breeders find them hard to name puppies under) — they remain
+  // available if the user types them manually.
   const usedLetters = new Set(existing.map((l) => l.letter));
+  const PREFERRED = "ABCDEFGHIJKLMNOPRSTUVW".split("");
   const ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-  const nextLetter = ALPHA.find((l) => !usedLetters.has(l)) ?? "A";
+  const nextLetter =
+    PREFERRED.find((l) => !usedLetters.has(l)) ??
+    ALPHA.find((l) => !usedLetters.has(l)) ??
+    "A";
+
+  // Pre-fill from a failed previous submit if the URL says so
+  const prefillLetter = params.letter ?? nextLetter;
+  const usedLettersList = [...usedLetters].sort().join(", ");
 
   async function create(formData: FormData) {
     "use server";
@@ -36,20 +48,31 @@ export default async function NyttKullPage() {
     const poetic = String(formData.get("poetic") ?? "").trim();
 
     if (!letter || !sireId || !damId || !matingDate) {
-      // Would normally re-render with errors; for now just abort.
-      return;
+      redirect(`/kull/nytt?error=missing&letter=${encodeURIComponent(letter)}`);
     }
 
-    // Estimated whelping = mating + 63 days (typical dog gestation)
+    // Duplicate-letter check (per kennel — for now hardcoded to "granheim",
+    // will become user.kennelId once auth fully wires kennel ownership)
+    const db = await getDb();
+    const allInKennel = await listLitters();
+    const conflict = allInKennel.find(
+      (l) => l.letter === letter && l.kennelId === "granheim",
+    );
+    if (conflict) {
+      redirect(
+        `/kull/nytt?error=duplicate&letter=${encodeURIComponent(letter)}`,
+      );
+    }
+
+    // Estimated whelping = mating + 63 days; delivery = whelping + 8 weeks
     const whelp = new Date(matingDate);
     whelp.setDate(whelp.getDate() + 63);
     const deliv = new Date(matingDate);
-    deliv.setDate(deliv.getDate() + 63 + 56); // whelp + 8 weeks
+    deliv.setDate(deliv.getDate() + 63 + 56);
 
     const id = `kull-${letter.toLowerCase()}-${Date.now().toString(36).slice(-4)}`;
     const callName = `Kull ${letter}`;
 
-    const db = await getDb();
     await db
       .insert(litters)
       .values({
@@ -101,11 +124,32 @@ export default async function NyttKullPage() {
         </header>
 
         <form action={create} className="flex flex-col gap-4">
-          <Field label="Kull-bokstav" hint="A → B → C … vi foreslår neste ledige.">
+          <Field
+            label="Kull-bokstav"
+            hint={
+              <>
+                FCI-land (Norge, Sverige, Tyskland) bruker bokstav per kull
+                — A, B, C … startes om på A når Z er nådd. Q/X/Y/Z hoppes
+                gjerne over. AKC (USA) og UK Royal Kennel Club krever ingen
+                bokstav, men du kan likevel bruke det for ryddig journal.
+                {usedLettersList && (
+                  <>
+                    {" "}
+                    Brukt så langt: <span className="font-mono">{usedLettersList}</span>.
+                  </>
+                )}
+              </>
+            }
+            error={
+              params.error === "duplicate"
+                ? `Bokstaven «${params.letter}» er allerede i bruk i denne kennelen.`
+                : undefined
+            }
+          >
             <input
               type="text"
               name="letter"
-              defaultValue={nextLetter}
+              defaultValue={prefillLetter}
               maxLength={2}
               required
               className="w-24 bg-bg-card border border-n-300 rounded-btn px-3 py-2 text-2xl font-mono font-semibold text-n-950 uppercase focus:outline-none focus:border-forest-500 text-center"
@@ -201,10 +245,12 @@ export default async function NyttKullPage() {
 function Field({
   label,
   hint,
+  error,
   children,
 }: {
   label: string;
-  hint?: string;
+  hint?: React.ReactNode;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -218,6 +264,11 @@ function Field({
         </span>
       )}
       {children}
+      {error && (
+        <span className="text-xs text-error-fg block mt-2 leading-relaxed">
+          ⚠ {error}
+        </span>
+      )}
     </label>
   );
 }
