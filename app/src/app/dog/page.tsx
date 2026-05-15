@@ -7,6 +7,8 @@ import { DogHero } from "@/components/dog-detail/DogHero";
 import { DogNameBlock } from "@/components/dog-detail/DogNameBlock";
 import { TabBar, type TabKey } from "@/components/dog-detail/TabBar";
 import { ProfilTab } from "@/components/dog-detail/ProfilTab";
+import { HelseTab } from "@/components/dog-detail/HelseTab";
+import { TitlerTab } from "@/components/dog-detail/TitlerTab";
 import { ToastProvider } from "@/components/dogworld/ToastProvider";
 
 /**
@@ -93,7 +95,7 @@ function DogDetailInner() {
           aria-labelledby={`tab-${activeTab}`}
           className="px-4 md:px-6 py-6 min-h-[240px]"
         >
-          {activeTab === "profil" ? (
+          {activeTab === "profil" && (
             <ProfilTab
               dog={dog}
               publicVisible={publicVisible}
@@ -105,9 +107,12 @@ function DogDetailInner() {
                 /* status sheet arrives in Sprint 3E */
               }}
             />
-          ) : (
-            <PlaceholderPanel tab={activeTab} />
           )}
+          {activeTab === "helse" && <HelseTab dog={dog} />}
+          {activeTab === "titler" && <TitlerTab dog={dog} />}
+          {(activeTab === "stamtavle" ||
+            activeTab === "bilder" ||
+            activeTab === "notater") && <PlaceholderPanel tab={activeTab} />}
         </section>
       </article>
     </div>
