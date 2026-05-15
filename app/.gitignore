@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local SQLite dev database (re-seeded via npm run db:reset && db:migrate && db:seed)
+.dev.db
+.dev.db-shm
+.dev.db-wal
+
+# Cloudflare wrangler local state (Sprint 15+)
+.wrangler/

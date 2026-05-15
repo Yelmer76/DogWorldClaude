@@ -34,6 +34,29 @@ Only escalate to Ole when:
 
 Never escalate "is it working?" — find out yourself first.
 
+## Local database workflow (Sprint 13+)
+
+The app reads/writes through Drizzle. Local dev = SQLite file
+(`app/.dev.db`); production = Cloudflare D1 with the same schema.
+
+```
+cd app
+npm run db:reset      # wipe local .dev.db (and WAL files)
+npm run db:generate   # write a new migration when schema.ts changes
+npm run db:migrate    # apply migrations to .dev.db
+npm run db:seed       # repopulate from src/data/universe.ts
+npm run db:studio     # open Drizzle Studio (web UI) to inspect data
+```
+
+After editing `src/db/schema.ts`, always run `db:generate` so the
+SQL migration lands in `app/drizzle/` and travels with the repo.
+The seed script is idempotent (deletes then re-inserts) so re-running
+it on a fresh `.dev.db` always brings the Granheim test universe back.
+
+Server components read via `@/db/queries`; never import `@/db/index`
+or `better-sqlite3` from a Client Component (Next.js will refuse to
+compile because both modules are marked `server-only`).
+
 ## Windows + PowerShell quirks (working environment)
 
 This machine runs Windows PowerShell 5.1. Two things bite if forgotten:
