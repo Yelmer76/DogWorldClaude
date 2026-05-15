@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { DogRow } from "@/db/schema";
 import { DogPhoto } from "@/components/dogworld/DogPhoto";
 import { TitleBadge, Tag } from "@/components/dogworld/Tag";
+import { Button } from "@/components/ui/Button";
 
 export function HunderClient({ initial }: { initial: DogRow[] }) {
   const [query, setQuery] = useState("");
@@ -28,8 +29,8 @@ export function HunderClient({ initial }: { initial: DogRow[] }) {
 
   return (
     <div className="px-4 md:px-8 py-5 md:py-8 flex flex-col gap-5">
-      {/* Desktop title + count */}
-      <div className="hidden md:flex items-baseline justify-between">
+      {/* Desktop title + count + new-dog CTA */}
+      <div className="hidden md:flex items-end justify-between gap-3">
         <div>
           <div className="text-[10px] uppercase tracking-[0.12em] font-mono text-forest-700 mb-2">
             Registeret
@@ -37,10 +38,22 @@ export function HunderClient({ initial }: { initial: DogRow[] }) {
           <h1 className="m-0 text-[28px] font-semibold tracking-[-0.015em] text-n-950">
             Hunder
           </h1>
+          <p className="m-0 mt-2 text-sm text-n-700 max-w-[60ch]">
+            Alle hunder i kennelen — aktive avlsdyr, pensjonerte, og
+            minner. Klikk en for å se detaljene.
+          </p>
         </div>
-        <span className="text-sm text-n-500 font-mono">
-          {visible.length} av {initial.length}
-        </span>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <span className="text-sm text-n-500 font-mono">
+            {visible.length} av {initial.length}
+          </span>
+          <Link href="/hunder/nytt">
+            <Button variant="primary" size="sm">
+              <span aria-hidden className="text-base leading-none">＋</span>
+              Ny hund
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Search */}
@@ -114,7 +127,21 @@ export function HunderClient({ initial }: { initial: DogRow[] }) {
             <DogRowCard dog={d} />
           </li>
         ))}
-        {visible.length === 0 && (
+        {visible.length === 0 && initial.length === 0 && (
+          <li className="border border-dashed border-n-300 rounded-card p-8 text-center flex flex-col items-center gap-3">
+            <p className="m-0 text-sm text-n-700 max-w-[40ch]">
+              Ingen hunder ennå. Begynn med å legge til den første — det
+              tar 30 sekunder.
+            </p>
+            <Link href="/hunder/nytt">
+              <Button variant="primary" size="sm">
+                <span aria-hidden className="text-base leading-none">＋</span>
+                Legg til første hund
+              </Button>
+            </Link>
+          </li>
+        )}
+        {visible.length === 0 && initial.length > 0 && (
           <li className="border border-dashed border-n-300 rounded-card p-6 text-center text-sm text-n-500 italic">
             Ingen hunder matcher søket.
           </li>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { listDogs } from "@/db/queries";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { HunderClient } from "./HunderClient";
@@ -15,7 +16,17 @@ export default async function HunderPage() {
 
   return (
     <>
-      <AppHeader />
+      <AppHeader
+        rightSlot={
+          <Link
+            href="/hunder/nytt"
+            aria-label="Legg til ny hund"
+            className="w-9 h-9 rounded-md grid place-items-center text-forest-700 hover:bg-forest-50 -mr-1.5 text-2xl leading-none"
+          >
+            +
+          </Link>
+        }
+      />
       <HunderClient initial={visible} />
     </>
   );
