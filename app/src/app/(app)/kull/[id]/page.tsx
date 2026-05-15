@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
-import { db } from "@/db";
-import { dogs as dogsTable, litters } from "@/db/schema";
+import { getDb } from "@/db";
+import { dogs as dogsTable } from "@/db/schema";
 import { getLitter, listApplications } from "@/db/queries";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { ToastProvider } from "@/components/dogworld/ToastProvider";
@@ -25,12 +25,21 @@ export default async function KullDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const litter = getLitter(id);
+  const litter = await getLitter(id);
   if (!litter) notFound();
 
-  const sire = db.select().from(dogsTable).where(eq(dogsTable.id, litter.sireId)).get();
-  const dam = db.select().from(dogsTable).where(eq(dogsTable.id, litter.damId)).get();
-  const apps = listApplications(litter.id);
+  const db = await getDb();
+  const sire = await db
+    .select()
+    .from(dogsTable)
+    .where(eq(dogsTable.id, litter.sireId))
+    .get();
+  const dam = await db
+    .select()
+    .from(dogsTable)
+    .where(eq(dogsTable.id, litter.damId))
+    .get();
+  const apps = await listApplications(litter.id);
 
   // Cast db puppy rows to the Puppy type the existing PuppyCard expects.
   const puppies = litter.puppies as unknown as Puppy[];

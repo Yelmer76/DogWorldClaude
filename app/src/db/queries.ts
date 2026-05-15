@@ -1,12 +1,13 @@
 /**
- * Server-only query helpers — high-level reads/writes that pages and
- * route handlers can call directly. Keep all SQL in this file (or in
- * the schema) so we have one place to optimise + swap drivers when
- * Sprint 15 moves to D1.
+ * Server-only query helpers — all functions are async so the same code
+ * works against better-sqlite3 (sync, dev) and D1 (Promise-based, prod).
+ *
+ * Drizzle's await on a sync better-sqlite3 result is a no-op, so the
+ * dev cost is zero.
  */
 import "server-only";
 import { eq, desc } from "drizzle-orm";
-import { db } from "./index";
+import { getDb } from "./index";
 import {
   dogs as dogsTable,
   dogHealthTests,
@@ -19,19 +20,21 @@ import {
 
 // ── Dogs ───────────────────────────────────────────────────────────────────
 
-export function listDogs() {
-  return db.select().from(dogsTable).all();
+export async function listDogs() {
+  const db = await getDb();
+  return await db.select().from(dogsTable).all();
 }
 
-export function getDog(id: string) {
-  const row = db.select().from(dogsTable).where(eq(dogsTable.id, id)).get();
+export async function getDog(id: string) {
+  const db = await getDb();
+  const row = await db.select().from(dogsTable).where(eq(dogsTable.id, id)).get();
   if (!row) return null;
-  const health = db
+  const health = await db
     .select()
     .from(dogHealthTests)
     .where(eq(dogHealthTests.dogId, id))
     .all();
-  const achievements = db
+  const achievements = await db
     .select()
     .from(dogAchievements)
     .where(eq(dogAchievements.dogId, id))
@@ -42,14 +45,16 @@ export function getDog(id: string) {
 
 // ── Litters ────────────────────────────────────────────────────────────────
 
-export function listLitters() {
-  return db.select().from(litters).orderBy(desc(litters.whelpingDate)).all();
+export async function listLitters() {
+  const db = await getDb();
+  return await db.select().from(litters).orderBy(desc(litters.whelpingDate)).all();
 }
 
-export function getLitter(id: string) {
-  const row = db.select().from(litters).where(eq(litters.id, id)).get();
+export async function getLitter(id: string) {
+  const db = await getDb();
+  const row = await db.select().from(litters).where(eq(litters.id, id)).get();
   if (!row) return null;
-  const litterPuppies = db
+  const litterPuppies = await db
     .select()
     .from(puppiesTable)
     .where(eq(puppiesTable.litterId, id))
@@ -57,8 +62,9 @@ export function getLitter(id: string) {
   return { ...row, puppies: litterPuppies };
 }
 
-export function listSires() {
-  return db
+export async function listSires() {
+  const db = await getDb();
+  return await db
     .select()
     .from(dogsTable)
     .where(eq(dogsTable.sex, "m"))
@@ -66,8 +72,9 @@ export function listSires() {
     .all();
 }
 
-export function listDams() {
-  return db
+export async function listDams() {
+  const db = await getDb();
+  return await db
     .select()
     .from(dogsTable)
     .where(eq(dogsTable.sex, "f"))
@@ -77,27 +84,25 @@ export function listDams() {
 
 // ── Applications ───────────────────────────────────────────────────────────
 
-export function listApplications(litterId?: string) {
-  const rows = litterId
-    ? db
-        .select()
-        .from(applicationsTable)
+export async function listApplications(litterId?: string) {
+  const db = await getDb();
+  const baseQuery = db.select().from(applicationsTable);
+  const rows = await (litterId
+    ? baseQuery
         .where(eq(applicationsTable.litterId, litterId))
         .orderBy(desc(applicationsTable.receivedAt))
         .all()
-    : db
-        .select()
-        .from(applicationsTable)
-        .orderBy(desc(applicationsTable.receivedAt))
-        .all();
+    : baseQuery.orderBy(desc(applicationsTable.receivedAt)).all());
 
   // Hydrate match indicators per application
-  return rows.map((a) => ({
-    ...a,
-    matches: db
-      .select()
-      .from(applicationMatches)
-      .where(eq(applicationMatches.applicationId, a.id))
-      .all(),
-  }));
+  return await Promise.all(
+    rows.map(async (a) => ({
+      ...a,
+      matches: await db
+        .select()
+        .from(applicationMatches)
+        .where(eq(applicationMatches.applicationId, a.id))
+        .all(),
+    })),
+  );
 }

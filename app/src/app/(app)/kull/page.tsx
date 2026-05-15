@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { eq } from "drizzle-orm";
-import { db } from "@/db";
-import { dogs as dogsTable } from "@/db/schema";
+import { inArray } from "drizzle-orm";
+import { getDb } from "@/db";
+import { dogs as dogsTable, type DogRow } from "@/db/schema";
 import { listLitters } from "@/db/queries";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { Tag } from "@/components/dogworld/Tag";
@@ -27,8 +27,19 @@ const stageTone: Record<keyof typeof stageLabel, "neutral" | "info" | "warning" 
   done: "neutral",
 };
 
-export default function KullListPage() {
-  const all = listLitters();
+export default async function KullListPage() {
+  const all = await listLitters();
+
+  // Resolve all parent dogs once, build an id → dog map
+  const parentIds = Array.from(
+    new Set(all.flatMap((l) => [l.sireId, l.damId])),
+  );
+  const db = await getDb();
+  const parentRows: DogRow[] =
+    parentIds.length > 0
+      ? await db.select().from(dogsTable).where(inArray(dogsTable.id, parentIds)).all()
+      : [];
+  const byId = new Map(parentRows.map((d) => [d.id, d]));
 
   return (
     <>
@@ -61,16 +72,8 @@ export default function KullListPage() {
         {all.length > 0 ? (
           <ul className="m-0 p-0 list-none flex flex-col gap-3">
             {all.map((litter) => {
-              const sire = db
-                .select()
-                .from(dogsTable)
-                .where(eq(dogsTable.id, litter.sireId))
-                .get();
-              const dam = db
-                .select()
-                .from(dogsTable)
-                .where(eq(dogsTable.id, litter.damId))
-                .get();
+              const sire = byId.get(litter.sireId);
+              const dam = byId.get(litter.damId);
               return (
                 <li key={litter.id}>
                   <Link

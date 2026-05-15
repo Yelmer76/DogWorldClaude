@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { db } from "@/db";
+import { getDb } from "@/db";
 import { litters } from "@/db/schema";
 import { listSires, listDams, listLitters } from "@/db/queries";
 import { AppHeader } from "@/components/shell/AppHeader";
@@ -16,9 +16,11 @@ import { Button } from "@/components/ui/Button";
  * later iteration.
  */
 export default async function NyttKullPage() {
-  const sires = listSires();
-  const dams = listDams();
-  const existing = listLitters();
+  const [sires, dams, existing] = await Promise.all([
+    listSires(),
+    listDams(),
+    listLitters(),
+  ]);
 
   // Suggest next letter — D after A/B/C, etc.
   const usedLetters = new Set(existing.map((l) => l.letter));
@@ -47,7 +49,9 @@ export default async function NyttKullPage() {
     const id = `kull-${letter.toLowerCase()}-${Date.now().toString(36).slice(-4)}`;
     const callName = `Kull ${letter}`;
 
-    db.insert(litters)
+    const db = await getDb();
+    await db
+      .insert(litters)
       .values({
         id,
         kennelId: "granheim",

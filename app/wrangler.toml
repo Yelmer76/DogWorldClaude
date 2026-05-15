@@ -1,0 +1,39 @@
+# Cloudflare deploy-konfig — Sprint 15.
+# Bruker @opennextjs/cloudflare for å bygge Next.js til en
+# Cloudflare Worker med statiske assets.
+#
+# Førstegangs-deploy (gjør én gang):
+#   1. npm install -g wrangler
+#   2. wrangler login
+#   3. wrangler d1 create dogworld-tmp
+#      → kopier database_id-en og lim inn under [[d1_databases]] nedenfor
+#   4. npm run cf:db:migrate
+#   5. npm run cf:db:seed
+#   6. wrangler secret put RESEND_API_KEY
+#      (paste re_-nøkkelen når den spør)
+#   7. npm run deploy
+#
+# Senere deploys:
+#   npm run deploy
+
+name = "dogworld-tmp"
+account_id = "1b66fabc2af3cdaa846d5668ebb2fb47"
+compatibility_date = "2026-05-15"
+compatibility_flags = ["nodejs_compat"]
+main = ".open-next/worker.js"
+
+# Statiske assets (CSS, JS-chunks, bilder) serveres direkte fra Cloudflare
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# D1-database — fyll inn database_id etter `wrangler d1 create dogworld-tmp`
+[[d1_databases]]
+binding = "DB"
+database_name = "dogworld-tmp"
+database_id = "FYLL_INN_ETTER_wrangler_d1_create"
+migrations_dir = "drizzle"
+
+# Resend-nøkkel settes som secret, ikke i denne fila:
+#   wrangler secret put RESEND_API_KEY
+#   wrangler secret put RESEND_FROM   (valgfritt, default = onboarding@resend.dev)

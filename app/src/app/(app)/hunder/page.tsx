@@ -7,8 +7,8 @@ import { HunderClient } from "./HunderClient";
  * SQLite db, filters out hidden ones, and hands them to a client child
  * for the interactive search + status filter.
  */
-export default function HunderPage() {
-  const all = listDogs();
+export default async function HunderPage() {
+  const all = await listDogs();
   const visible = all
     .filter((d) => !d.hidden)
     .sort((a, b) => a.name.localeCompare(b.name, "nb"));
