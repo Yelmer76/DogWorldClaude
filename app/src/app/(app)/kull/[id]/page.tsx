@@ -146,7 +146,11 @@ export default async function KullDetailPage({
                 )}
               </section>
 
-              <ApplicationsInbox />
+              <ApplicationsInbox
+                applications={apps}
+                puppies={litter.puppies}
+                litterId={litter.id}
+              />
             </div>
 
             <aside>

@@ -1,98 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useToast } from "@/components/dogworld/ToastProvider";
 import { Button } from "@/components/ui/Button";
-import type { Dog } from "@/data/universe";
+import { addDogNote } from "@/lib/actions/notes";
+import type { DogNoteRow } from "@/db/schema";
 
 export type NotaterTabProps = {
-  dog: Dog;
+  dogId: string;
+  dogName: string;
+  notes: DogNoteRow[];
 };
-
-type Note = {
-  id: string;
-  date: string;
-  time: string;
-  body: string;
-};
-
-const seedNotes: Note[] = [
-  {
-    id: "n1",
-    date: "12. mai 2026",
-    time: "09:42",
-    body: "Veiing: 22,4 kg. Stabilt etter parring med Bella. Spiser normalt, energinivå normalt.",
-  },
-  {
-    id: "n2",
-    date: "08. mai 2026",
-    time: "07:10",
-    body: "Klart for NKK Bergen. Behold dietten — har fungert godt frem til nå. Pels i god stand.",
-  },
-  {
-    id: "n3",
-    date: "28. apr 2026",
-    time: "11:30",
-    body: "HD-røntgen tatt hos Solheim. Han var rolig — ingen sedasjon nødvendig. Resultat ventes innen 14 dager.",
-  },
-  {
-    id: "n4",
-    date: "12. mar 2026",
-    time: "10:15",
-    body: "Øyenlysning hos Brevik (Voss). Klar. Neste innen 12. mar 2027.",
-  },
-  {
-    id: "n5",
-    date: "14. feb 2026",
-    time: "22:50",
-    body: "Bella har gått inn i løpetid. Planlegger parring siste uke av februar. Astor er fokusert.",
-  },
-];
 
 const NB_MONTHS = [
-  "jan",
-  "feb",
-  "mar",
-  "apr",
-  "mai",
-  "jun",
-  "jul",
-  "aug",
-  "sep",
-  "okt",
-  "nov",
-  "des",
+  "jan", "feb", "mar", "apr", "mai", "jun",
+  "jul", "aug", "sep", "okt", "nov", "des",
 ];
 
-function formatNow(): { date: string; time: string } {
-  const now = new Date();
-  const dd = now.getDate().toString().padStart(2, "0");
-  const mm = NB_MONTHS[now.getMonth()];
-  const yyyy = now.getFullYear();
-  const hh = now.getHours().toString().padStart(2, "0");
-  const min = now.getMinutes().toString().padStart(2, "0");
+function formatNote(iso: string): { date: string; time: string } {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return { date: iso, time: "" };
+  const dd = d.getDate().toString().padStart(2, "0");
+  const mm = NB_MONTHS[d.getMonth()];
+  const yyyy = d.getFullYear();
+  const hh = d.getHours().toString().padStart(2, "0");
+  const min = d.getMinutes().toString().padStart(2, "0");
   return { date: `${dd}. ${mm} ${yyyy}`, time: `${hh}:${min}` };
 }
 
-export function NotaterTab({ dog }: NotaterTabProps) {
+export function NotaterTab({ dogId, dogName, notes }: NotaterTabProps) {
   const showToast = useToast();
-  const [notes, setNotes] = useState<Note[]>(seedNotes);
   const [draft, setDraft] = useState("");
+  const [pending, startTransition] = useTransition();
 
-  const canSave = draft.trim().length > 0;
+  const canSave = draft.trim().length > 0 && !pending;
 
   function submit() {
     if (!canSave) return;
-    const { date, time } = formatNow();
-    const note: Note = {
-      id: `n-${Date.now()}`,
-      date,
-      time,
-      body: draft.trim(),
-    };
-    setNotes((prev) => [note, ...prev]);
-    setDraft("");
-    showToast("Notat lagret");
+    const body = draft.trim();
+    setDraft(""); // optimistic clear
+    startTransition(async () => {
+      try {
+        await addDogNote(dogId, body);
+        showToast("Notat lagret");
+      } catch (err) {
+        // Restore draft on failure
+        setDraft(body);
+        showToast(
+          err instanceof Error ? err.message : "Kunne ikke lagre notatet",
+          "error",
+        );
+      }
+    });
   }
 
   return (
@@ -104,9 +63,10 @@ export function NotaterTab({ dog }: NotaterTabProps) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             rows={3}
-            placeholder={`Notat om ${dog.callName ?? dog.name} — vekt, atferd, kommende avtaler…`}
+            placeholder={`Notat om ${dogName} — vekt, atferd, kommende avtaler…`}
             className="w-full text-sm text-n-950 placeholder:text-n-500 bg-transparent resize-none focus:outline-none leading-snug"
             aria-label="Skriv nytt notat"
+            disabled={pending}
           />
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-n-100">
             <span className="inline-flex items-center gap-1.5 text-[11px] text-n-500 font-mono uppercase tracking-[0.05em]">
@@ -119,7 +79,7 @@ export function NotaterTab({ dog }: NotaterTabProps) {
               state={canSave ? "default" : "disabled"}
               onClick={submit}
             >
-              Lagre notat
+              {pending ? "Lagrer…" : "Lagre notat"}
             </Button>
           </div>
         </div>
@@ -132,26 +92,29 @@ export function NotaterTab({ dog }: NotaterTabProps) {
             Tidslinje
           </h2>
           <span className="text-xs text-n-500 font-mono">
-            {notes.length} notater
+            {notes.length} {notes.length === 1 ? "notat" : "notater"}
           </span>
         </div>
         <div className="flex flex-col gap-3">
-          {notes.map((n) => (
-            <article
-              key={n.id}
-              className="bg-bg-card border border-n-200 rounded-card p-4"
-            >
-              <header className="flex items-baseline justify-between gap-3 mb-1.5">
-                <span className="text-xs font-medium text-n-950">{n.date}</span>
-                <span className="text-[11px] text-n-500 font-mono">
-                  {n.time}
-                </span>
-              </header>
-              <p className="text-sm text-n-700 leading-relaxed whitespace-pre-wrap">
-                {n.body}
-              </p>
-            </article>
-          ))}
+          {notes.map((n) => {
+            const { date, time } = formatNote(n.createdAt);
+            return (
+              <article
+                key={n.id}
+                className="bg-bg-card border border-n-200 rounded-card p-4"
+              >
+                <header className="flex items-baseline justify-between gap-3 mb-1.5">
+                  <span className="text-xs font-medium text-n-950">{date}</span>
+                  <span className="text-[11px] text-n-500 font-mono">
+                    {time}
+                  </span>
+                </header>
+                <p className="text-sm text-n-700 leading-relaxed whitespace-pre-wrap">
+                  {n.body}
+                </p>
+              </article>
+            );
+          })}
           {notes.length === 0 && (
             <div className="border border-dashed border-n-300 rounded-card p-8 text-center text-sm text-n-500">
               Ingen notater ennå. Skriv det første over.

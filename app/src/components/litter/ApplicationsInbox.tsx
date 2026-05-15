@@ -1,19 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { Tag } from "@/components/dogworld/Tag";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/dogworld/ToastProvider";
 import { OfferPuppyModal } from "@/components/modals/OfferPuppyModal";
-import {
-  applications,
-  puppies,
-  type Application,
-  type ApplicationStatus,
-} from "@/data/universe";
+import { setApplicationStatus, offerPuppy } from "@/lib/actions/applications";
+import type {
+  ApplicationRow,
+  ApplicationMatchRow,
+  PuppyRow,
+} from "@/db/schema";
+
+type Status = ApplicationRow["status"];
+
+type AppWithMatches = ApplicationRow & { matches: ApplicationMatchRow[] };
 
 const statusVariant: Record<
-  ApplicationStatus,
+  Status,
   "neutral" | "info" | "success" | "warning" | "error"
 > = {
   NY: "info",
@@ -29,7 +33,7 @@ const matchDot: Record<"ok" | "warn" | "err", string> = {
   err: "bg-error-dot",
 };
 
-const filters: { id: "all" | ApplicationStatus; label: string }[] = [
+const filters: { id: "all" | Status; label: string }[] = [
   { id: "all", label: "Alle" },
   { id: "NY", label: "Nye" },
   { id: "I_SAMTALE", label: "I samtale" },
@@ -38,42 +42,119 @@ const filters: { id: "all" | ApplicationStatus; label: string }[] = [
   { id: "AVVIST", label: "Avvist" },
 ];
 
-function puppyName(id?: string): string {
-  if (!id) return "—";
-  return puppies.find((p) => p.id === id)?.name ?? id;
-}
+const labelFor: Record<Status, string> = {
+  NY: "NY",
+  I_SAMTALE: "I SAMTALE",
+  GODKJENT: "GODKJENT",
+  TILBUDT_VALP: "TILBUDT VALP",
+  AVVIST: "AVVIST",
+};
 
-export function ApplicationsInbox() {
+export type ApplicationsInboxProps = {
+  applications: AppWithMatches[];
+  puppies: PuppyRow[];
+  litterId: string;
+};
+
+export function ApplicationsInbox({
+  applications,
+  puppies,
+  litterId,
+}: ApplicationsInboxProps) {
   const showToast = useToast();
-  const [filter, setFilter] = useState<"all" | ApplicationStatus>("all");
+  const [filter, setFilter] = useState<"all" | Status>("all");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [offerTo, setOfferTo] = useState<Application | null>(null);
+  const [offerTo, setOfferTo] = useState<AppWithMatches | null>(null);
+  const [, startTransition] = useTransition();
+
+  // Optimistic state — user sees the new status instantly
+  const [optimisticApps, applyOptimistic] = useOptimistic<
+    AppWithMatches[],
+    { id: string; status: Status; assignedPuppyId?: string }
+  >(applications, (current, change) =>
+    current.map((a) =>
+      a.id === change.id
+        ? {
+            ...a,
+            status: change.status,
+            statusLabel: labelFor[change.status],
+            assignedPuppyId:
+              change.assignedPuppyId !== undefined
+                ? change.assignedPuppyId
+                : a.assignedPuppyId,
+          }
+        : a,
+    ),
+  );
 
   const visible =
     filter === "all"
-      ? applications
-      : applications.filter((a) => a.status === filter);
+      ? optimisticApps
+      : optimisticApps.filter((a) => a.status === filter);
+
+  function setStatus(app: AppWithMatches, status: Status, label: string) {
+    startTransition(async () => {
+      applyOptimistic({ id: app.id, status });
+      try {
+        await setApplicationStatus(app.id, status, litterId);
+        showToast(label);
+      } catch (err) {
+        showToast(
+          err instanceof Error ? err.message : "Kunne ikke oppdatere",
+          "error",
+        );
+      }
+    });
+  }
+
+  function handleOfferAccepted(puppyId: string) {
+    if (!offerTo) return;
+    const target = offerTo;
+    setOfferTo(null);
+    startTransition(async () => {
+      applyOptimistic({
+        id: target.id,
+        status: "TILBUDT_VALP",
+        assignedPuppyId: puppyId,
+      });
+      try {
+        await offerPuppy(target.id, puppyId, litterId);
+        const puppyName = puppies.find((p) => p.id === puppyId)?.name ?? puppyId;
+        showToast(`Tilbud sendt til ${target.applicant}: ${puppyName}`);
+      } catch (err) {
+        showToast(
+          err instanceof Error ? err.message : "Kunne ikke sende tilbud",
+          "error",
+        );
+      }
+    });
+  }
+
+  function puppyName(id?: string | null): string {
+    if (!id) return "—";
+    return puppies.find((p) => p.id === id)?.name ?? id;
+  }
 
   return (
     <section>
       <header className="flex items-baseline justify-between mb-3 flex-wrap gap-2">
         <h2 className="text-xs uppercase tracking-[0.06em] font-medium text-n-500 m-0">
-          Søknader · {applications.length} totalt
+          Søknader · {optimisticApps.length} totalt
         </h2>
         <div className="flex gap-1 overflow-x-auto -mx-1 px-1">
           {filters.map((f) => {
             const active = f.id === filter;
             const count =
               f.id === "all"
-                ? applications.length
-                : applications.filter((a) => a.status === f.id).length;
+                ? optimisticApps.length
+                : optimisticApps.filter((a) => a.status === f.id).length;
             return (
               <button
                 key={f.id}
                 type="button"
                 onClick={() => setFilter(f.id)}
                 className={
-                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-colors " +
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs whitespace-nowrap transition-colors flex-shrink-0 " +
                   (active
                     ? "bg-forest-700 text-white"
                     : "bg-bg-card border border-n-200 text-n-700 hover:border-n-300")
@@ -99,15 +180,11 @@ export function ApplicationsInbox() {
           <li key={a.id}>
             <ApplicationRow
               application={a}
+              puppyNameFor={puppyName}
               expanded={openId === a.id}
               onToggle={() => setOpenId(openId === a.id ? null : a.id)}
-              onAction={(label) => {
-                if (label === "Tilby valp") {
-                  setOfferTo(a);
-                } else {
-                  showToast(`→ ${label}`, "info");
-                }
-              }}
+              onSetStatus={(status, label) => setStatus(a, status, label)}
+              onOpenOffer={() => setOfferTo(a)}
             />
           </li>
         ))}
@@ -122,6 +199,10 @@ export function ApplicationsInbox() {
         open={offerTo !== null}
         onClose={() => setOfferTo(null)}
         applicantName={offerTo?.applicant ?? ""}
+        availablePuppies={puppies.filter(
+          (p) => p.status === "tilgjengelig" || p.status === "tilbudt",
+        )}
+        onAccept={handleOfferAccepted}
       />
     </section>
   );
@@ -129,14 +210,18 @@ export function ApplicationsInbox() {
 
 function ApplicationRow({
   application,
+  puppyNameFor,
   expanded,
   onToggle,
-  onAction,
+  onSetStatus,
+  onOpenOffer,
 }: {
-  application: Application;
+  application: AppWithMatches;
+  puppyNameFor: (id?: string | null) => string;
   expanded: boolean;
   onToggle: () => void;
-  onAction: (label: string) => void;
+  onSetStatus: (status: Status, label: string) => void;
+  onOpenOffer: () => void;
 }) {
   const a = application;
   return (
@@ -167,7 +252,7 @@ function ApplicationRow({
               <>
                 <span className="text-n-300 mx-1.5">·</span>
                 <span className="text-warning-fg">
-                  Tilbudt {puppyName(a.assignedPuppyId)}
+                  Tilbudt {puppyNameFor(a.assignedPuppyId)}
                 </span>
               </>
             )}
@@ -217,14 +302,14 @@ function ApplicationRow({
                 <Button
                   variant="primary"
                   size="sm"
-                  onClick={() => onAction("Start samtale")}
+                  onClick={() => onSetStatus("I_SAMTALE", "Samtale startet")}
                 >
                   Start samtale
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => onAction("Avvis høflig")}
+                  onClick={() => onSetStatus("AVVIST", "Søknaden avvist")}
                 >
                   Avvis høflig
                 </Button>
@@ -232,19 +317,17 @@ function ApplicationRow({
             )}
             {a.status === "I_SAMTALE" && (
               <>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => onAction("Tilby valp")}
-                >
+                <Button variant="primary" size="sm" onClick={onOpenOffer}>
                   Tilby valp
                 </Button>
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => onAction("Send melding")}
+                  onClick={() =>
+                    onSetStatus("GODKJENT", "Markert som godkjent")
+                  }
                 >
-                  Send melding
+                  Godkjenn
                 </Button>
               </>
             )}
@@ -252,7 +335,9 @@ function ApplicationRow({
               <Button
                 variant="primary"
                 size="sm"
-                onClick={() => onAction("Send kjøpskontrakt")}
+                onClick={() =>
+                  onSetStatus("TILBUDT_VALP", "Kontrakt-flow er på vei")
+                }
               >
                 Send kjøpskontrakt
               </Button>
@@ -261,7 +346,7 @@ function ApplicationRow({
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => onAction("Send påminnelse")}
+                onClick={() => onSetStatus("GODKJENT", "Påminnelse sendt")}
               >
                 Send påminnelse
               </Button>

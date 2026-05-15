@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { Button } from "@/components/ui/Button";
 import { Tag } from "@/components/dogworld/Tag";
 import { ToastProvider, useToast } from "@/components/dogworld/ToastProvider";
+import { confirmEthics } from "@/lib/actions/kennel";
 
 /**
  * Etikk-erklæring — bi-monthly self-declaration that gates the +50
@@ -63,6 +64,7 @@ function EthicsForm() {
   const router = useRouter();
   const showToast = useToast();
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
+  const [pending, startTransition] = useTransition();
   const allYes =
     questions.length === Object.values(answers).filter((a) => a === "yes")
       .length;
@@ -81,8 +83,18 @@ function EthicsForm() {
       return;
     }
     if (!allYes) return;
-    showToast("Etikk-erklæring bekreftet · +50 karma 🎉", "success");
-    setTimeout(() => router.push("/mer"), 800);
+    startTransition(async () => {
+      try {
+        await confirmEthics();
+        showToast("Etikk-erklæring bekreftet · +50 karma 🎉", "success");
+        setTimeout(() => router.push("/mer"), 800);
+      } catch (err) {
+        showToast(
+          err instanceof Error ? err.message : "Kunne ikke lagre erklæringen",
+          "error",
+        );
+      }
+    });
   }
 
   return (
