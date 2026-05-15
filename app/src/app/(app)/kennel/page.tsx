@@ -206,7 +206,7 @@ function Section({
 function PublicDogCard({ dog }: { dog: PublicDog }) {
   return (
     <Link
-      href="/dog"
+      href={`/dog/${dog.id}`}
       className="group flex gap-4 bg-bg-card border border-n-200 rounded-card overflow-hidden hover:border-n-300 hover:shadow-[0_1px_2px_rgba(26,26,26,0.04),0_1px_1px_rgba(26,26,26,0.03)] transition-all"
     >
       <div className="w-28 h-28 md:w-32 md:h-32 flex-shrink-0">

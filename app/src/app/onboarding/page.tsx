@@ -761,7 +761,7 @@ function PublishedStep() {
         <NextStep
           n="1"
           t="Last opp første bilde av Astor"
-          href="/dog"
+          href="/dog/astor"
         />
         <NextStep n="2" t="Bekreft etikk-erklæringen (+50 karma)" href="/today" />
         <NextStep n="3" t="Inviter første valpekjøper" href="/litter" />

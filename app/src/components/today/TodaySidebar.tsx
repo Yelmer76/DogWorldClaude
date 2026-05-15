@@ -67,7 +67,8 @@ export function TodaySidebar() {
           Snarveier
         </div>
         <ul className="m-0 p-0 list-none flex flex-col gap-1.5">
-          <ShortcutLink href="/dog">Astor — hund-detaljer</ShortcutLink>
+          <ShortcutLink href="/hunder">Hunder — registret</ShortcutLink>
+          <ShortcutLink href="/dog/astor">Astor — hund-detaljer</ShortcutLink>
           <ShortcutLink href="/pedigree">Stamtavle-utforsker</ShortcutLink>
           <ShortcutLink href="/litter">Kull C — dagbok</ShortcutLink>
           <ShortcutLink href="/kennel">Offentlig kennelside</ShortcutLink>

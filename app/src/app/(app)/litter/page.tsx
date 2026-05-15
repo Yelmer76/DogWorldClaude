@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { dogs, litterC, puppies } from "@/data/universe";
 import { AppHeader } from "@/components/shell/AppHeader";
 import { ToastProvider } from "@/components/dogworld/ToastProvider";
@@ -57,6 +58,7 @@ function LitterInner() {
               <ParentChip
                 role="Far"
                 name={sire?.callName ?? sire?.name ?? "—"}
+                href={sire ? `/dog/${sire.id}` : undefined}
                 tone="sire"
               />
               <span aria-hidden className="text-n-300 text-xl">
@@ -65,6 +67,7 @@ function LitterInner() {
               <ParentChip
                 role="Mor"
                 name={dam?.callName ?? dam?.name ?? "—"}
+                href={dam ? `/dog/${dam.id}` : undefined}
                 tone="dam"
               />
             </div>
@@ -191,14 +194,16 @@ function LitterInner() {
 function ParentChip({
   role,
   name,
+  href,
   tone,
 }: {
   role: string;
   name: string;
+  href?: string;
   tone: "sire" | "dam";
 }) {
-  return (
-    <div className="inline-flex items-center gap-2 bg-bg-page border border-n-200 rounded-full pl-1 pr-3 py-1">
+  const body = (
+    <>
       <span
         className={
           "w-7 h-7 rounded-full grid place-items-center text-xs font-medium " +
@@ -216,8 +221,18 @@ function ParentChip({
         </span>
         <span className="font-medium text-n-950">{name}</span>
       </span>
-    </div>
+    </>
   );
+  const cls =
+    "inline-flex items-center gap-2 bg-bg-page border border-n-200 rounded-full pl-1 pr-3 py-1 transition-colors";
+  if (href) {
+    return (
+      <Link href={href} className={cls + " hover:border-forest-500"}>
+        {body}
+      </Link>
+    );
+  }
+  return <div className={cls}>{body}</div>;
 }
 
 function Stat({

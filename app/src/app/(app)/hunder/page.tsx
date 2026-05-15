@@ -135,10 +135,6 @@ export default function HunderPage() {
           )}
         </ul>
 
-        <p className="text-xs text-n-500 px-1">
-          Per-hund-routing kommer i Sprint 11. Inntil da åpner alle radene
-          Astor-detaljen.
-        </p>
       </div>
     </>
   );
@@ -148,7 +144,7 @@ function DogRow({ dog }: { dog: Dog }) {
   const isMem = dog.status === "memorial";
   return (
     <Link
-      href="/dog"
+      href={`/dog/${dog.id}`}
       className="group flex gap-3 bg-bg-card border border-n-200 rounded-card p-2 pr-4 hover:border-n-300 hover:shadow-[0_1px_2px_rgba(26,26,26,0.04),0_1px_1px_rgba(26,26,26,0.03)] transition-all items-center"
     >
       <div className="w-14 h-14 flex-shrink-0">
